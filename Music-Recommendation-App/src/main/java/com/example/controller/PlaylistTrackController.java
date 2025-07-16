@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/playlist-tracks")
+@RequestMapping("/musicapp/playlist-tracks")
 public class PlaylistTrackController {
 
     private final PlaylistTrackRepository playlistTrackRepository;

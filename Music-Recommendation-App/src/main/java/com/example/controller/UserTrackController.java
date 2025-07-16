@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-tracks")
+@RequestMapping("/musicapp/user-tracks")
 public class UserTrackController {
 
     private final UserTrackRepository userTrackRepository;

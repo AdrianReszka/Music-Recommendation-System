@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tracks")
+@RequestMapping("/musicapp/tracks")
 public class TrackController {
 
     private final TrackRepository trackRepository;
@@ -41,5 +41,9 @@ public class TrackController {
     public void delete(@PathVariable Long id) {
         trackRepository.deleteById(id);
     }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello from backend!"; }
 }
 
