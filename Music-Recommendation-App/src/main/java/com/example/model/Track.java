@@ -23,9 +23,9 @@ public class Track {
 
     private String artist;
 
-    private String lastfmId;
-
     private String spotifyId;
+
+    private String lastfmId;
 
     private String source;
 

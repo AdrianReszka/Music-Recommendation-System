@@ -5,7 +5,7 @@ function App() {
 
     const handleClick = async () => {
         try {
-            const res = await fetch('musicapp/tracks/hello')
+            const res = await fetch('musicapp/lastfm/loved')
             if (!res.ok) {
                 setMessage(`Błąd: ${res.status}`)
                 return
