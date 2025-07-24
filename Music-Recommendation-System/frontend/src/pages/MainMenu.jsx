@@ -1,55 +1,28 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import MenuButton from '../components/MenuButton.jsx';
-import TopBar from "../components/TopBar.jsx";
+import { useState } from 'react';
+import TopBar from '../components/TopBar.jsx';
+import Sidebar from '../components/Sidebar.jsx';
 
-function App() {
-    const [message, setMessage] = useState('');
-
-    useEffect(() => {
-        document.documentElement.classList.add("overflow-x-hidden", "overflow-y-hidden", "m-0", "p-0");
-        document.body.classList.add("overflow-x-hidden", "overflow-y-hidden", "m-0", "p-0");
-    }, []);
-
-    const handleDownloadLoved = async () => {
-        try {
-            const res = await fetch('musicapp/lastfm/loved');
-            if (!res.ok) {
-                setMessage(`Błąd: ${res.status}`);
-                return;
-            }
-            const text = await res.text();
-            setMessage(text);
-        } catch (error) {
-            setMessage(`Błąd połączenia: ${error.message}`);
-        }
-    };
-
-    const handleGenerateRecommendations = () => {
-        setMessage("Wygenerowano rekomendacje (placeholder)");
-    };
-
-    const handleSaveAsPlaylist = () => {
-        setMessage("Zapisano playlistę (placeholder)");
-    };
-
-    const handleLogout = () => {
-        setMessage("Wylogowano");
-    };
+function MainMenu() {
+    const [activeView, setActiveView] = useState('loved');
 
     return (
         <>
             <TopBar username="Snusik" />
 
-            <div className="h-[calc(100vh-60px)] w-screen mt-[60px] flex flex-col justify-center items-center gap-4 text-center">
-                <MenuButton label="Download loved tracks" onClick={handleDownloadLoved} />
-                <MenuButton label="Generate recommendations" onClick={handleGenerateRecommendations} />
-                <MenuButton label="Save as playlist" onClick={handleSaveAsPlaylist} />
-                <MenuButton label="Logout" onClick={handleLogout} />
-                {message && <p className="mt-4 text-sm text-white">{message}</p>}
+            <div className="w-screen mt-[10vh] h-[90vh] flex flex-row overflow-hidden">
+
+                <Sidebar setActiveView={setActiveView} />
+
+                <div className="flex-1 bg-[#1f1f1f] text-white p-8 overflow-y-auto h-full">
+                    {activeView === 'loved' && <p className="text-xl">📥 Tutaj pojawią się loved tracks</p>}
+                    {activeView === 'recommend' && <p className="text-xl">🧠 Tutaj będą rekomendacje</p>}
+                    {activeView === 'playlist' && <p className="text-xl">🎧 Tutaj stworzysz playlistę</p>}
+                    {activeView === 'logout' && <p className="text-xl text-red-400">Wylogowano</p>}
+                </div>
             </div>
         </>
     );
 }
 
-export default App;
+export default MainMenu;
