@@ -8,17 +8,17 @@ function Sidebar({ setActiveView }) {
             <div className="flex-1 flex flex-col items-center justify-center">
                 <SidebarButton text="Loved Tracks" onClick={() => setActiveView('loved')} />
             </div>
-            <hr className="w-[80%] mx-auto border-t border-gray-600" />
+            <hr className="w-[80%] mx-auto border-t border-gray-500" />
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 <SidebarButton text="Recommendations" onClick={() => setActiveView('recommend')} />
             </div>
-            <hr className="w-[80%] mx-auto border-t border-gray-600" />
+            <hr className="w-[80%] mx-auto border-t border-gray-500" />
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 <SidebarButton text="Create Playlist" onClick={() => setActiveView('playlist')} />
             </div>
-            <hr className="w-[80%] mx-auto border-t border-gray-600" />
+            <hr className="w-[80%] mx-auto border-t border-gray-500" />
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 <SidebarButton text="Logout" onClick={() => setActiveView('logout')} isLogout />

@@ -4,24 +4,18 @@ function SidebarButton({ text, onClick, isLogout = false }) {
     return (
         <button
             onClick={onClick}
-            className={`w-4/5 h-2/5 text-[1.25rem] font-bold rounded transition whitespace-nowrap flex items-center justify-center
+            onMouseUp={(e) => e.currentTarget.blur()} // 👈 kluczowa linia
+            className={`w-4/5 h-2/5 text-[1.25rem] font-bold rounded-2xl transition whitespace-nowrap flex items-center justify-center shadow-md
+                border border-transparent hover:border-white focus:border-white focus:outline-none
                 ${isLogout
-                ? 'bg-[#353535] text-red-400 hover:bg-red-500 hover:text-white'
-                : 'bg-[#353535] hover:bg-[#444] text-white'
+                ? 'bg-[#1a1a1a] text-red-400 hover:bg-red-500 hover:text-white'
+                : 'bg-[#1a1a1a] hover:bg-[#444] text-white'
             }`}
-            onMouseEnter={e => {
-                e.currentTarget.style.border = '1px solid white';
-            }}
-            onMouseLeave={e => {
-                e.currentTarget.style.border = '1px solid transparent';
-            }}
-            onBlur={e => {
-                e.currentTarget.style.outline = 'none';
-            }}
         >
             {text}
         </button>
     );
 }
+
 
 export default SidebarButton;
