@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.UserTrack;
-import com.example.repository.UserTrackRepository;
+import com.example.service.UserTrackService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,25 @@ import java.util.List;
 @RequestMapping("/musicapp/user-tracks")
 public class UserTrackController {
 
-    private final UserTrackRepository userTrackRepository;
+    private final UserTrackService userTrackService;
 
-    public UserTrackController(UserTrackRepository userTrackRepository) {
-        this.userTrackRepository = userTrackRepository;
+    public UserTrackController(UserTrackService userTrackService) {
+        this.userTrackService = userTrackService;
     }
 
     @GetMapping
     public List<UserTrack> getAll() {
-        return userTrackRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public UserTrack getById(@PathVariable Long id) {
-        return userTrackRepository.findById(id).orElse(null);
+        return userTrackService.getAll();
     }
 
     @PostMapping
-    public UserTrack create(@RequestBody UserTrack entity) {
-        return userTrackRepository.save(entity);
-    }
-
-    @PutMapping("/{id}")
-    public UserTrack update(@PathVariable Long id, @RequestBody UserTrack updated) {
-        updated.setId(id);
-        return userTrackRepository.save(updated);
+    public UserTrack create(@RequestBody UserTrack track) {
+        return userTrackService.create(track);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        userTrackRepository.deleteById(id);
+        userTrackService.delete(id);
     }
 }
+

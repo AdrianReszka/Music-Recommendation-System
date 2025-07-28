@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.Playlist;
-import com.example.repository.PlaylistRepository;
+import com.example.service.PlaylistService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,29 @@ import java.util.List;
 @RequestMapping("/musicapp/playlists")
 public class PlaylistController {
 
-    private final PlaylistRepository playlistRepository;
+    private final PlaylistService playlistService;
 
-    public PlaylistController(PlaylistRepository playlistRepository) {
-        this.playlistRepository = playlistRepository;
+    public PlaylistController(PlaylistService playlistService) {
+        this.playlistService = playlistService;
     }
 
     @GetMapping
-    public List<Playlist> getAll() {
-        return playlistRepository.findAll();
+    public List<Playlist> getAllPlaylists() {
+        return playlistService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Playlist getById(@PathVariable Long id) {
-        return playlistRepository.findById(id).orElse(null);
+    public Playlist getPlaylist(@PathVariable Long id) {
+        return playlistService.getById(id);
     }
 
     @PostMapping
-    public Playlist create(@RequestBody Playlist entity) {
-        return playlistRepository.save(entity);
-    }
-
-    @PutMapping("/{id}")
-    public Playlist update(@PathVariable Long id, @RequestBody Playlist updated) {
-        updated.setId(id);
-        return playlistRepository.save(updated);
+    public Playlist createPlaylist(@RequestBody Playlist playlist) {
+        return playlistService.create(playlist);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        playlistRepository.deleteById(id);
+    public void deletePlaylist(@PathVariable Long id) {
+        playlistService.delete(id);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.Recommendation;
-import com.example.repository.RecommendationRepository;
+import com.example.service.RecommendationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +10,24 @@ import java.util.List;
 @RequestMapping("/musicapp/recommendations")
 public class RecommendationController {
 
-    private final RecommendationRepository recommendationRepository;
+    private final RecommendationService recommendationService;
 
-    public RecommendationController(RecommendationRepository recommendationRepository) {
-        this.recommendationRepository = recommendationRepository;
+    public RecommendationController(RecommendationService recommendationService) {
+        this.recommendationService = recommendationService;
     }
 
     @GetMapping
-    public List<Recommendation> getAll() {
-        return recommendationRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public Recommendation getById(@PathVariable Long id) {
-        return recommendationRepository.findById(id).orElse(null);
+    public List<Recommendation> getAllRecommendations() {
+        return recommendationService.getAll();
     }
 
     @PostMapping
-    public Recommendation create(@RequestBody Recommendation entity) {
-        return recommendationRepository.save(entity);
-    }
-
-    @PutMapping("/{id}")
-    public Recommendation update(@PathVariable Long id, @RequestBody Recommendation updated) {
-        updated.setId(id);
-        return recommendationRepository.save(updated);
+    public Recommendation createRecommendation(@RequestBody Recommendation recommendation) {
+        return recommendationService.create(recommendation);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        recommendationRepository.deleteById(id);
+    public void deleteRecommendation(@PathVariable Long id) {
+        recommendationService.delete(id);
     }
 }

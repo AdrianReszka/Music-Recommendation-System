@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.User;
-import com.example.repository.UserRepository;
+import com.example.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,36 +10,30 @@ import java.util.List;
 @RequestMapping("/musicapp/users")
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return userRepository.findAll();
+    public List<User> getAllUsers() {
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    public User getById(@PathVariable Long id) {
-        return userRepository.findById(id).orElse(null);
+    public User getUserById(@PathVariable Long id) {
+        return userService.getById(id);
     }
 
     @PostMapping
-    public User create(@RequestBody User user) {
-        return userRepository.save(user);
-    }
-
-    @PutMapping("/{id}")
-    public User update(@PathVariable Long id, @RequestBody User updated) {
-        updated.setId(id);
-        return userRepository.save(updated);
+    public User createUser(@RequestBody User user) {
+        return userService.create(user);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        userRepository.deleteById(id);
+    public void deleteUser(@PathVariable Long id) {
+        userService.delete(id);
     }
 }
 

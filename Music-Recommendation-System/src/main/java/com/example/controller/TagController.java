@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.Tag;
 import com.example.repository.TagRepository;
+import com.example.service.TagService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,35 +11,24 @@ import java.util.List;
 @RequestMapping("/musicapp/tags")
 public class TagController {
 
-    private final TagRepository tagRepository;
+    private final TagService tagService;
 
-    public TagController(TagRepository tagRepository) {
-        this.tagRepository = tagRepository;
+    public TagController(TagService tagService) {
+        this.tagService = tagService;
     }
 
     @GetMapping
-    public List<Tag> getAll() {
-        return tagRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public Tag getById(@PathVariable Long id) {
-        return tagRepository.findById(id).orElse(null);
+    public List<Tag> getAllTags() {
+        return tagService.getAll();
     }
 
     @PostMapping
-    public Tag create(@RequestBody Tag tag) {
-        return tagRepository.save(tag);
-    }
-
-    @PutMapping("/{id}")
-    public Tag update(@PathVariable Long id, @RequestBody Tag updated) {
-        updated.setId(id);
-        return tagRepository.save(updated);
+    public Tag createTag(@RequestBody Tag tag) {
+        return tagService.create(tag);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        tagRepository.deleteById(id);
+    public void deleteTag(@PathVariable Long id) {
+        tagService.delete(id);
     }
 }
