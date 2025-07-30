@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     open: true,
     proxy: {
-      '/musicapp': 'https://localhost:8443'
+      '/musicapp': 'http://localhost:8080'
     }
   }
 })
