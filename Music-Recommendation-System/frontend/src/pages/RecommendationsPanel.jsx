@@ -84,8 +84,8 @@ export default function RecommendationsPanel() {
                             <label
                                 key={track.id}
                                 className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                           bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
-                           focus-within:border-white transition"
+                                            bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
+                                           transition focus:outline-none"
                             >
                                 <input
                                     type="checkbox"
