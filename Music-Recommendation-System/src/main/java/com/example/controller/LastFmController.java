@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.TrackDto;
 import com.example.model.Track;
 import com.example.service.LastFmService;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,9 @@ public class LastFmController {
     }
 
     @GetMapping("/loved")
-    public ResponseEntity<List<Track>> getLovedTracks(@RequestParam String username) {
-        List<Track> lovedTracks = lastFmService.fetchLovedTracks(username);
+    public ResponseEntity<List<TrackDto>> getLovedTracks(@RequestParam String username) {
+        List<TrackDto> lovedTracks = lastFmService.fetchLovedTracks(username);
         return ResponseEntity.ok(lovedTracks);
     }
+
 }

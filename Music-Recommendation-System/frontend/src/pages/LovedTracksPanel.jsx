@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import UsernameInput from '../components/UsernameInput';
-import DownloadButton from '../components/DownloadButton';
-import StatusMessage from '../components/StatusMessage';
+import PanelButton from "../components/PanelButton.jsx";
 
 export default function LovedTracksPanel() {
     const [username, setUsername] = useState('');
@@ -44,7 +43,9 @@ export default function LovedTracksPanel() {
                             <UsernameInput value={username} onChange={e => setUsername(e.target.value)} />
                         </div>
                         <div className="w-full sm:w-auto">
-                            <DownloadButton onClick={handleDownload} />
+                            <PanelButton onClick={handleDownload}>
+                                Download loved tracks
+                            </PanelButton>
                         </div>
                     </div>
 

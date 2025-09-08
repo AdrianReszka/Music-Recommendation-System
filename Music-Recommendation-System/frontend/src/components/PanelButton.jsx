@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DownloadButton({ onClick }) {
+export default function PanelButton({ onClick, children }) {
     return (
         <button
             onClick={onClick}
@@ -9,7 +9,7 @@ export default function DownloadButton({ onClick }) {
                        px-6 py-3 bg-[#1a1a1a] hover:bg-[#444] text-white
                        border border-transparent hover:border-white focus:border-white focus:outline-none"
         >
-            Download loved tracks
+            {children}
         </button>
     );
 }
