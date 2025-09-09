@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import LovedTracksPanel from "./LovedTracksPanel.jsx";
 import RecommendationsPanel from "./RecommendationsPanel.jsx";
+import PlaylistsPanel from "./PlaylistsPanel.jsx";
 
 function MainMenu() {
     const [activeView, setActiveView] = useState('loved');
@@ -19,7 +20,7 @@ function MainMenu() {
                 <div className="flex-1 bg-[#1f1f1f] text-white p-8 overflow-y-auto h-full shadow-md">
                     {activeView === 'loved' && <LovedTracksPanel />}
                     {activeView === 'recommend' && <RecommendationsPanel />}
-                    {activeView === 'playlist' && <p className="text-xl">🎧 Tutaj stworzysz playlistę</p>}
+                    {activeView === 'playlist' && <PlaylistsPanel />}
                     {activeView === 'logout' && <p className="text-xl text-red-400">Wylogowano</p>}
                 </div>
 

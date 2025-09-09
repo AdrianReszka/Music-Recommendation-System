@@ -2,6 +2,16 @@ import * as React from 'react';
 import SidebarButton from './SidebarButton';
 
 function Sidebar({ setActiveView }) {
+
+    const handleLogout = () => {
+        localStorage.removeItem("spotify_token");
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("username");
+
+        window.location.href = "/";
+    };
+
     return (
         <div className="h-full w-full max-w-[400px] min-w-[240px] bg-[#2a2a2a] shadow-md flex flex-col">
 
@@ -21,7 +31,7 @@ function Sidebar({ setActiveView }) {
             <hr className="w-[80%] mx-auto border-t border-gray-500" />
 
             <div className="flex-1 flex flex-col items-center justify-center">
-                <SidebarButton text="Logout" onClick={() => setActiveView('logout')} isLogout />
+                <SidebarButton text="Logout" onClick={handleLogout} isLogout />
             </div>
 
         </div>

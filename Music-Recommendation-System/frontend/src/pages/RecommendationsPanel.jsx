@@ -58,7 +58,7 @@ export default function RecommendationsPanel() {
                     <div className="w-full flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <DropdownSelect
-                                options={["Adicom loved tracks", "Ziomeczek loved tracks"]}
+                                options={["Adicom loved tracks", "Ziomeczek loved tracks", "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks"]}
                                 placeholder="Choose a list"
                                 value={selectedList}
                                 onChange={handleListChange}
@@ -73,7 +73,8 @@ export default function RecommendationsPanel() {
 
                     {createdFrom && (
                         <p className="text-gray-300 text-xl">
-                            Created recommendations based on: {createdFrom}
+                            Created recommendations based on:{" "}
+                            <span className="font-bold text-white">"{createdFrom}"</span>
                         </p>
                     )}
                 </div>

@@ -37,10 +37,10 @@ export default function LovedTracksPanel() {
                 </h2>
 
                 <div className="flex flex-col gap-4">
-                    <label className="text-gray-300 text-xl">Your Last.fm username</label>
+                    <label className="text-gray-300 text-xl">Enter Last.fm username</label>
                     <div className="w-full flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 ">
-                            <UsernameInput value={username} onChange={e => setUsername(e.target.value)} />
+                            <UsernameInput value={username} onChange={e => setUsername(e.target.value)} placeholder={"User name"} />
                         </div>
                         <div className="w-full sm:w-auto">
                             <PanelButton onClick={handleDownload}>
@@ -50,7 +50,9 @@ export default function LovedTracksPanel() {
                     </div>
 
                     {savedAs && (
-                        <p className="text-gray-300 gap-4 text-xl">Saved as: {savedAs}</p>
+                        <p className="text-gray-300 text-xl">
+                            Saved as: <span className="font-bold text-white">"{savedAs}"</span>
+                        </p>
                     )}
                 </div>
 
