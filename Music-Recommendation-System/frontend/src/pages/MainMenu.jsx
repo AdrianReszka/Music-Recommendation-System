@@ -21,7 +21,6 @@ function MainMenu() {
                     {activeView === 'loved' && <LovedTracksPanel />}
                     {activeView === 'recommend' && <RecommendationsPanel />}
                     {activeView === 'playlist' && <PlaylistsPanel />}
-                    {activeView === 'logout' && <p className="text-xl text-red-400">Wylogowano</p>}
                 </div>
 
             </div>
