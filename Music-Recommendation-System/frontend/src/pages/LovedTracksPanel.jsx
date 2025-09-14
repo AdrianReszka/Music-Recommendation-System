@@ -13,7 +13,7 @@ export default function LovedTracksPanel() {
         }
 
         try {
-            const response = await fetch(`musicapp/lastfm/loved?username=${username}`, {
+            const response = await fetch(`/musicapp/user-tracks/import?username=${username}`, {
                 method: 'GET',
             });
             if (response.ok) {

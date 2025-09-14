@@ -1,47 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PanelButton from "../components/PanelButton.jsx";
 import DropdownSelect from "../components/DropdownSelect.jsx";
 
 export default function RecommendationsPanel() {
+    const [users, setUsers] = useState([]);
     const [selectedList, setSelectedList] = useState('');
     const [recommendations, setRecommendations] = useState([]);
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [createdFrom, setCreatedFrom] = useState('');
 
-    const handleListChange = (listName) => {
+    // pobieramy userów do dropdowna
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const res = await fetch("/musicapp/users"); // endpoint zwracający userów z lastfmUsername
+                const data = await res.json();
+                setUsers(data.map(u => u.lastfmUsername));
+            } catch (err) {
+                console.error("Failed to fetch users", err);
+            }
+        };
+        fetchUsers();
+    }, []);
+
+    // zmiana listy w dropdownie
+    const handleListChange = async (listName) => {
         setSelectedList(listName);
 
-        if (listName === 'Adicom loved tracks') {
-            setRecommendations([
-                { id: 1, title: "Alex boy", artist: "Actum" },
-                { id: 2, title: "Franktors", artist: "Tremple" },
-                { id: 3, title: "Chelsea", artist: "Satatica" },
-                { id: 4, title: "DJ Sample", artist: "Beat1" },
-                { id: 5, title: "MC Test", artist: "Flow2" },
-                { id: 6, title: "Band XYZ", artist: "Track3" },
-                { id: 7, title: "Artist A", artist: "Song7" },
-                { id: 8, title: "Artist B", artist: "Song8" },
-                { id: 9, title: "Artist C", artist: "Song9" },
-                { id: 10, title: "Artist D", artist: "Song10" },
-            ]);
-        } else if (listName === 'Ziomeczek loved tracks') {
-            setRecommendations([
-                { id: 11, title: "Demo Artist", artist: "Alpha" },
-                { id: 12, title: "Demo Artist", artist: "Beta" },
-                { id: 13, title: "Demo Artist", artist: "Gamma" },
-            ]);
-        } else {
+        // wyciągamy username (bez " loved tracks")
+        const username = listName.replace(" loved tracks", "");
+
+        try {
+            const res = await fetch(`/musicapp/user-tracks/${username}`);
+            if (res.ok) {
+                const data = await res.json();
+
+                // 🟢 DEBUG – sprawdzamy co przyszło
+                console.log("Tracks fetched for user:", username, data);
+
+                setRecommendations(data);
+            } else {
+                console.error("Failed to fetch tracks, status:", res.status);
+                setRecommendations([]);
+            }
+        } catch (err) {
+            console.error("Failed to fetch tracks", err);
             setRecommendations([]);
         }
 
         setSelectedTracks([]);
     };
 
-    const toggleTrack = (id) => {
+    const toggleTrack = (idx) => {
         setSelectedTracks(prev =>
-            prev.includes(id)
-                ? prev.filter(tid => tid !== id)
-                : [...prev, id]
+            prev.includes(idx)
+                ? prev.filter(tid => tid !== idx)
+                : [...prev, idx]
         );
     };
 
@@ -53,12 +67,13 @@ export default function RecommendationsPanel() {
                     Generate Recommendations
                 </h2>
 
+                {/* dropdown z listą userów */}
                 <div className="flex flex-col gap-4">
                     <label className="text-gray-300 text-xl">Select loved tracks list</label>
                     <div className="w-full flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <DropdownSelect
-                                options={["Adicom loved tracks", "Ziomeczek loved tracks", "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks" , "Ziomeczek loved tracks"]}
+                                options={users.map(u => `${u} loved tracks`)}
                                 placeholder="Choose a list"
                                 value={selectedList}
                                 onChange={handleListChange}
@@ -79,19 +94,20 @@ export default function RecommendationsPanel() {
                     )}
                 </div>
 
+                {/* lista tracków */}
                 {recommendations.length > 0 && (
                     <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
-                        {recommendations.map(track => (
+                        {recommendations.map((track, idx) => (
                             <label
-                                key={track.id}
+                                key={idx}
                                 className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                                            bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
+                                           bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
                                            transition focus:outline-none"
                             >
                                 <input
                                     type="checkbox"
-                                    checked={selectedTracks.includes(track.id)}
-                                    onChange={() => toggleTrack(track.id)}
+                                    checked={selectedTracks.includes(idx)}
+                                    onChange={() => toggleTrack(idx)}
                                     className="w-5 h-5 accent-white"
                                 />
                                 <div className="flex flex-col">
@@ -107,4 +123,3 @@ export default function RecommendationsPanel() {
         </div>
     );
 }
-
