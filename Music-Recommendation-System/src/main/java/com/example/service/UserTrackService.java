@@ -79,6 +79,7 @@ public class UserTrackService {
                 .map(ut -> {
                     Track t = ut.getTrack();
                     return new TrackDto(
+                            t.getId(),
                             t.getTitle(),
                             t.getArtist(),
                             t.getSpotifyId(),

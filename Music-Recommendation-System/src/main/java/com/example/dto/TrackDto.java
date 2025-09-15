@@ -10,6 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class TrackDto {
+    private Long id;
     private String title;
     private String artist;
     private String spotifyId;

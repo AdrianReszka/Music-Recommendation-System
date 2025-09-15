@@ -24,4 +24,14 @@ public class LastFmController {
         return ResponseEntity.ok(lovedTracks);
     }
 
+    @PostMapping("/similar")
+    public ResponseEntity<List<TrackDto>> getSimilarTracks(
+            @RequestParam String username,
+            @RequestBody List<Long> selectedTrackIds
+    ) {
+        List<TrackDto> result = lastFmService.fetchSimilarTracksForUser(username, selectedTrackIds);
+        return ResponseEntity.ok(result);
+    }
+
+
 }

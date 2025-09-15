@@ -2,10 +2,11 @@ package com.example.service;
 
 import com.example.model.Recommendation;
 import com.example.repository.RecommendationRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,5 +25,6 @@ public class RecommendationService {
     public void delete(Long id) {
         recommendationRepository.deleteById(id);
     }
+
 }
 
