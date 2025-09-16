@@ -5,12 +5,16 @@ import PanelButton from "../components/PanelButton.jsx";
 export default function LovedTracksPanel() {
     const [username, setUsername] = useState('');
     const [savedAs, setSavedAs] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleDownload = async () => {
         if (!username.trim()) {
             alert("Please enter your Last.fm username.");
             return;
         }
+
+        setIsLoading(true);
+        setSavedAs("");
 
         try {
             const response = await fetch(`/musicapp/user-tracks/import?username=${username}`, {
@@ -25,6 +29,8 @@ export default function LovedTracksPanel() {
         } catch (err) {
             console.error("Error while fetching loved tracks:", err);
             alert("Error while fetching loved tracks");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -39,8 +45,12 @@ export default function LovedTracksPanel() {
                 <div className="flex flex-col gap-4">
                     <label className="text-gray-300 text-xl">Enter Last.fm username</label>
                     <div className="w-full flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 ">
-                            <UsernameInput value={username} onChange={e => setUsername(e.target.value)} placeholder={"User name"} />
+                        <div className="flex-1">
+                            <UsernameInput
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
+                                placeholder={"User name"}
+                            />
                         </div>
                         <div className="w-full sm:w-auto">
                             <PanelButton onClick={handleDownload}>
@@ -49,11 +59,13 @@ export default function LovedTracksPanel() {
                         </div>
                     </div>
 
-                    {savedAs && (
+                    {isLoading ? (
+                        <p className="text-gray-300 text-xl">Fetching loved tracks...</p>
+                    ) : savedAs ? (
                         <p className="text-gray-300 text-xl">
                             Saved as: <span className="font-bold text-white">"{savedAs}"</span>
                         </p>
-                    )}
+                    ) : null}
                 </div>
 
             </div>

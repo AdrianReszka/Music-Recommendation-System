@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import com.example.model.Recommendation;
+import com.example.model.Track;
 import com.example.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,5 +14,7 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     List<String> findDistinctUsernames();
 
     List<Recommendation> findByUser(User user);
+
+    boolean existsByUserAndTrack(User user, Track track);
 
 }

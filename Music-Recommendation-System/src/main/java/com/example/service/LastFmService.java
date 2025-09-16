@@ -220,7 +220,7 @@ public class LastFmService {
                                 t.setArtist(simArtist);
                                 t.setSource("lastfm");
                                 t.setTags(tagEntities);
-                                return t;
+                                return trackRepository.save(t);
                             });
 
                     if (scoredMap.containsKey(key)) {
@@ -241,20 +241,8 @@ public class LastFmService {
                 .limit(25)
                 .toList();
 
-        System.out.println("[Last.fm Recommendation Scoring for " + username + "]");
-        topScored.forEach(scored -> {
-            Track t = scored.track;
-            System.out.printf("→ %s - %s | matchCount: %d | sharedTags: %d | score: %d%n",
-                    t.getArtist(),
-                    t.getTitle(),
-                    scored.matchCount,
-                    scored.sharedTagCount,
-                    scored.score());
-        });
-        System.out.println("Total recommendations: " + topScored.size());
-
         List<ScoredTrack> filtered = topScored.stream()
-                .filter(scored -> scored.score() >= 9)
+                .filter(scored -> scored.score() >= 6)
                 .toList();
 
         User user = userRepository.findByLastfmUsername(username)
@@ -263,14 +251,13 @@ public class LastFmService {
         for (ScoredTrack scored : filtered) {
             Track track = scored.track;
 
-            if (track.getId() == null) {
-                track = trackRepository.save(track);
+            boolean exists = recommendationRepository.existsByUserAndTrack(user, track);
+            if (!exists) {
+                Recommendation rec = new Recommendation();
+                rec.setUser(user);
+                rec.setTrack(track);
+                recommendationRepository.save(rec);
             }
-
-            Recommendation rec = new Recommendation();
-            rec.setUser(user);
-            rec.setTrack(track);
-            recommendationRepository.save(rec);
         }
 
         return filtered.stream()

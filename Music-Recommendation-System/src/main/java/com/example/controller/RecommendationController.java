@@ -4,6 +4,7 @@ import com.example.dto.TrackDto;
 import com.example.model.Recommendation;
 import com.example.service.RecommendationService;
 import com.example.repository.RecommendationRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,9 +44,11 @@ public class RecommendationController {
         return recommendationRepository.findDistinctUsernames();
     }
 
-    @GetMapping("/user/{username}")
-    public List<TrackDto> getRecommendationsForUser(@PathVariable String username) {
-        return recommendationService.getRecommendationsForUser(username);
+    @PostMapping("/save")
+    public ResponseEntity<Void> saveRecommendations(@RequestParam String username, @RequestBody List<TrackDto> tracks) {
+        recommendationService.saveRecommendations(username, tracks);
+        return ResponseEntity.ok().build();
     }
+
 }
 

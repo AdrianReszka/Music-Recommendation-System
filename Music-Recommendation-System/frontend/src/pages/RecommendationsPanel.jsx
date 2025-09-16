@@ -8,6 +8,7 @@ export default function RecommendationsPanel() {
     const [recommendations, setRecommendations] = useState([]);
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [createdFrom, setCreatedFrom] = useState('');
+    const [isLoading, setIsLoading] = useState(false); // 👈 nowy stan
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -43,11 +44,7 @@ export default function RecommendationsPanel() {
             const res = await fetch(endpoint);
             if (res.ok) {
                 const data = await res.json();
-
-                console.log("Tracks fetched for user:", username, data);
-
                 setRecommendations(data);
-                console.log("Tracks received from backend:", data);
             } else {
                 console.error("Failed to fetch tracks, status:", res.status);
                 setRecommendations([]);
@@ -75,28 +72,17 @@ export default function RecommendationsPanel() {
         setRecommendations([]);
         setSelectedTracks([]);
         setCreatedFrom("");
+        setIsLoading(true);
 
         try {
             const res = await fetch(`/musicapp/lastfm/similar?username=${username}`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(selectedTracks)
             });
-
             if (res.ok) {
                 const data = await res.json();
-
-                console.log("Recommendations received:");
-                data.forEach(track => {
-                    const tagNames = (track.tags || []).map(tag => tag.name);
-                    console.log(`- ${track.artist} - ${track.title} [${tagNames.join(", ")}]`);
-                });
-
-                setRecommendations(data);
-                setCreatedFrom(`${username} (recommended)`);
-
+                setCreatedFrom(username);
             } else {
                 const err = await res.text();
                 console.error("Failed to generate recommendations:", err);
@@ -105,6 +91,8 @@ export default function RecommendationsPanel() {
         } catch (err) {
             console.error("Error generating recommendations", err);
             alert("Failed to generate recommendations");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -134,12 +122,13 @@ export default function RecommendationsPanel() {
                         </div>
                     </div>
 
-                    {createdFrom && (
+                    {isLoading ? (
+                        <p className="text-gray-300 text-xl">Generating recommendations...</p>
+                    ) : createdFrom ? (
                         <p className="text-gray-300 text-xl">
-                            Created recommendations based on:{" "}
-                            <span className="font-bold text-white">"{createdFrom}"</span>
+                            Saved as: <span className="font-bold text-white">"Recommended tracks for {createdFrom}"</span>
                         </p>
-                    )}
+                    ) : null}
                 </div>
 
                 {recommendations.length > 0 && (
@@ -165,7 +154,6 @@ export default function RecommendationsPanel() {
                         ))}
                     </div>
                 )}
-
             </div>
         </div>
     );
