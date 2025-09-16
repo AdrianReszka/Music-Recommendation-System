@@ -25,10 +25,22 @@ export default function RecommendationsPanel() {
     const handleListChange = async (listName) => {
         setSelectedList(listName);
 
-        const username = listName.replace(" loved tracks", "");
+        const username = listName
+            .replace(" loved tracks", "")
+            .replace("Recommended tracks for ", "");
+
+        let endpoint = "";
+        if (listName.includes("loved tracks")) {
+            endpoint = `/musicapp/user-tracks/${username}`;
+        } else if (listName.includes("Recommended tracks")) {
+            endpoint = `/musicapp/recommendations/user/${username}`;
+        } else {
+            console.warn("Unknown list selected");
+            return;
+        }
 
         try {
-            const res = await fetch(`/musicapp/user-tracks/${username}`);
+            const res = await fetch(endpoint);
             if (res.ok) {
                 const data = await res.json();
 
@@ -46,6 +58,7 @@ export default function RecommendationsPanel() {
         }
 
         setSelectedTracks([]);
+        setCreatedFrom("");
     };
 
     const toggleTrack = (trackId) => {
@@ -58,6 +71,10 @@ export default function RecommendationsPanel() {
 
     const handleGenerate = async () => {
         const username = selectedList.replace(" loved tracks", "");
+
+        setRecommendations([]);
+        setSelectedTracks([]);
+        setCreatedFrom("");
 
         try {
             const res = await fetch(`/musicapp/lastfm/similar?username=${username}`, {
@@ -80,7 +97,6 @@ export default function RecommendationsPanel() {
                 setRecommendations(data);
                 setCreatedFrom(`${username} (recommended)`);
 
-                setSelectedTracks([]);
             } else {
                 const err = await res.text();
                 console.error("Failed to generate recommendations:", err);

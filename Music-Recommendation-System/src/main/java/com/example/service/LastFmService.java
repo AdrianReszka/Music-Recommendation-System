@@ -129,15 +129,27 @@ public class LastFmService {
     }
 
     public List<TrackDto> fetchSimilarTracksForUser(String username, List<Long> selectedTrackIds) {
-        User user = userRepository.findByLastfmUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        List<Track> selectedTracks = trackRepository.findAllWithTagsByIdIn(selectedTrackIds);
 
-        List<Track> baseTracks = trackRepository.findAllWithTagsByIdIn(selectedTrackIds);
+        Set<String> userPreferredTags = selectedTracks.stream()
+                .flatMap(t -> t.getTags().stream())
+                .map(Tag::getName)
+                .collect(Collectors.toSet());
 
-        Set<String> alreadyProcessed = new HashSet<>();
-        List<TrackDto> recommendations = new ArrayList<>();
+        record ScoredTrack(Track track, int matchCount, int sharedTagCount) {
+            int score() {
+                return matchCount * 3 + sharedTagCount;
+            }
 
-        for (Track base : baseTracks) {
+            ScoredTrack increment(Track newTrack, Set<String> newTags, Set<String> preferredTags) {
+                int shared = (int) newTags.stream().filter(preferredTags::contains).count();
+                return new ScoredTrack(newTrack, matchCount + 1, sharedTagCount + shared);
+            }
+        }
+
+        Map<String, ScoredTrack> scoredMap = new HashMap<>();
+
+        for (Track base : selectedTracks) {
             String artist = URLEncoder.encode(base.getArtist(), StandardCharsets.UTF_8);
             String title = URLEncoder.encode(base.getTitle(), StandardCharsets.UTF_8);
 
@@ -150,7 +162,6 @@ public class LastFmService {
             try {
                 ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
                 Map body = response.getBody();
-
                 if (body == null || !body.containsKey("similartracks")) continue;
 
                 Map similar = (Map) body.get("similartracks");
@@ -162,10 +173,10 @@ public class LastFmService {
                     String simTitle = (String) trackMap.get("name");
 
                     String key = simArtist + "::" + simTitle;
-                    if (alreadyProcessed.contains(key)) continue;
-                    alreadyProcessed.add(key);
 
-                    Set<Tag> tags = new HashSet<>();
+                    Set<String> fetchedTagNames = new HashSet<>();
+                    Set<Tag> tagEntities = new HashSet<>();
+
                     try {
                         String tagUrl = "https://ws.audioscrobbler.com/2.0/?method=track.gettoptags" +
                                 "&artist=" + URLEncoder.encode(simArtist, StandardCharsets.UTF_8) +
@@ -184,13 +195,16 @@ public class LastFmService {
                                 for (Object o : tagListRaw) {
                                     if (o instanceof Map tagMap) {
                                         String tagName = (String) tagMap.get("name");
+                                        fetchedTagNames.add(tagName);
+
                                         Tag tag = tagRepository.findByName(tagName)
                                                 .orElseGet(() -> {
                                                     Tag newTag = new Tag();
                                                     newTag.setName(tagName);
                                                     return tagRepository.saveAndFlush(newTag);
                                                 });
-                                        tags.add(tag);
+
+                                        tagEntities.add(tag);
                                     }
                                 }
                             }
@@ -205,45 +219,77 @@ public class LastFmService {
                                 t.setTitle(simTitle);
                                 t.setArtist(simArtist);
                                 t.setSource("lastfm");
-                                t.setTags(tags);
-                                return trackRepository.save(t);
+                                t.setTags(tagEntities);
+                                return t;
                             });
 
-                    Recommendation rec = new Recommendation();
-                    rec.setUser(user);
-                    rec.setTrack(track);
-                    recommendationRepository.save(rec);
-
-                    recommendations.add(new TrackDto(
-                            track.getId(),
-                            track.getTitle(),
-                            track.getArtist(),
-                            track.getSpotifyId(),
-                            track.getLastfmId(),
-                            track.getSource(),
-                            tags.stream().map(tag -> {
-                                TagDto dto = new TagDto();
-                                dto.setName(tag.getName());
-                                return dto;
-                            }).collect(Collectors.toSet())
-                    ));
+                    if (scoredMap.containsKey(key)) {
+                        ScoredTrack updated = scoredMap.get(key).increment(track, fetchedTagNames, userPreferredTags);
+                        scoredMap.put(key, updated);
+                    } else {
+                        int shared = (int) fetchedTagNames.stream().filter(userPreferredTags::contains).count();
+                        scoredMap.put(key, new ScoredTrack(track, 1, shared));
+                    }
                 }
-
-                System.out.println("Last.fm recommendations for user: " + username);
-                for (TrackDto track : recommendations) {
-                    String tagList = track.getTags().stream()
-                            .map(TagDto::getName)
-                            .collect(Collectors.joining(", "));
-
-                    System.out.println("→ " + track.getArtist() + " - " + track.getTitle() + " [" + tagList + "]");
-                }
-
             } catch (Exception e) {
                 System.err.println("Error while fetching similar for: " + base.getTitle() + " - " + e.getMessage());
             }
         }
 
-        return recommendations;
-    }
+        List<ScoredTrack> topScored = scoredMap.values().stream()
+                .sorted(Comparator.comparingInt(ScoredTrack::score).reversed())
+                .limit(25)
+                .toList();
 
+        System.out.println("[Last.fm Recommendation Scoring for " + username + "]");
+        topScored.forEach(scored -> {
+            Track t = scored.track;
+            System.out.printf("→ %s - %s | matchCount: %d | sharedTags: %d | score: %d%n",
+                    t.getArtist(),
+                    t.getTitle(),
+                    scored.matchCount,
+                    scored.sharedTagCount,
+                    scored.score());
+        });
+        System.out.println("Total recommendations: " + topScored.size());
+
+        List<ScoredTrack> filtered = topScored.stream()
+                .filter(scored -> scored.score() >= 9)
+                .toList();
+
+        User user = userRepository.findByLastfmUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        for (ScoredTrack scored : filtered) {
+            Track track = scored.track;
+
+            if (track.getId() == null) {
+                track = trackRepository.save(track);
+            }
+
+            Recommendation rec = new Recommendation();
+            rec.setUser(user);
+            rec.setTrack(track);
+            recommendationRepository.save(rec);
+        }
+
+        return filtered.stream()
+                .map(scored -> {
+                    Track t = scored.track;
+                    return new TrackDto(
+                            t.getId(),
+                            t.getTitle(),
+                            t.getArtist(),
+                            t.getSpotifyId(),
+                            t.getLastfmId(),
+                            t.getSource(),
+                            t.getTags().stream().map(tag -> {
+                                TagDto dto = new TagDto();
+                                dto.setName(tag.getName());
+                                return dto;
+                            }).collect(Collectors.toSet())
+                    );
+                })
+                .toList();
+    }
 }
