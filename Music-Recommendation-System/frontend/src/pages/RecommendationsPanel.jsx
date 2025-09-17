@@ -8,7 +8,7 @@ export default function RecommendationsPanel() {
     const [recommendations, setRecommendations] = useState([]);
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [createdFrom, setCreatedFrom] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // 👈 nowy stan
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchUsers = async () => {
