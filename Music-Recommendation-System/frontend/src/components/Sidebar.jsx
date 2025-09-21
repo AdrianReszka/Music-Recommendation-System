@@ -4,10 +4,9 @@ import SidebarButton from './SidebarButton';
 function Sidebar({ setActiveView }) {
 
     const handleLogout = () => {
-        localStorage.removeItem("spotify_token");
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        localStorage.removeItem("username");
+        localStorage.removeItem("spotify_username");
+        localStorage.removeItem("spotify_access_token");
+        localStorage.removeItem("spotify_refresh_token");
 
         window.location.href = "/";
     };

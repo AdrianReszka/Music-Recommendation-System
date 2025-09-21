@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.dto.TagDto;
 import com.example.dto.TrackDto;
 import com.example.model.Recommendation;
 import com.example.model.Track;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +50,32 @@ public class RecommendationService {
                 recommendationRepository.save(rec);
             });
         }
+    }
+
+    public List<TrackDto> getRecommendationsForUser(String username) {
+        User user = userRepository.findByLastfmUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        List<Recommendation> recommendations = recommendationRepository.findByUser(user);
+
+        return recommendations.stream()
+                .map(rec -> {
+                    Track t = rec.getTrack();
+                    return new TrackDto(
+                            t.getId(),
+                            t.getTitle(),
+                            t.getArtist(),
+                            t.getSpotifyId(),
+                            t.getLastfmId(),
+                            t.getSource(),
+                            t.getTags().stream().map(tag -> {
+                                TagDto dto = new TagDto();
+                                dto.setName(tag.getName());
+                                return dto;
+                            }).collect(Collectors.toSet())
+                    );
+                })
+                .toList();
     }
 }
 

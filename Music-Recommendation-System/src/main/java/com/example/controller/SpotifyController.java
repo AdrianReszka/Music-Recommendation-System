@@ -1,12 +1,16 @@
 package com.example.controller;
 
-import com.example.model.CreateSpotifyPlaylistRequest;
+import com.example.model.SpotifyUser;
 import com.example.service.SpotifyService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RestController
 @RequestMapping("/musicapp/spotify")
@@ -16,29 +20,20 @@ public class SpotifyController {
     private final SpotifyService spotifyService;
 
     @GetMapping("/login")
-    public ResponseEntity<Void> login(@RequestParam("userId") Integer userId) {
-        URI redirectUri = spotifyService.buildAuthorizationUri(userId);
-        return ResponseEntity.status(HttpStatus.FOUND).location(redirectUri).build();
+    public void login(HttpServletResponse response) throws IOException {
+        String loginUrl = spotifyService.buildLoginUrl();
+        response.sendRedirect(loginUrl);
     }
 
     @GetMapping("/callback")
-    public ResponseEntity<String> callback(@RequestParam String code,
-                                           @RequestParam Long state) {
-        spotifyService.exchangeCodeForToken(code, state);
-        return ResponseEntity.ok("Spotify login successful!");
+    public void callback(@RequestParam String code, HttpServletResponse response) throws IOException {
+        SpotifyUser user = spotifyService.exchangeCodeAndSaveUser(code);
+        response.sendRedirect("http://localhost:5173/spotify-callback?username=" + URLEncoder.encode(user.getSpotifyId(), StandardCharsets.UTF_8));
     }
 
-    @PostMapping("/playlist")
-    public ResponseEntity<Void> createPlaylist(@RequestParam("userId") Long userId,
-                                               @RequestBody CreateSpotifyPlaylistRequest request) {
-        spotifyService.createPlaylistForUser(request, userId);
+    @PostMapping("/save-playlist")
+    public ResponseEntity<Void> savePlaylist(@RequestParam String username, @RequestBody List<String> trackUris) {
+        spotifyService.createPlaylistWithTracks(username, trackUris);
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/me")
-    public ResponseEntity<String> getSpotifyDisplayName(@RequestParam("userId") Long userId) {
-        String displayName = spotifyService.getDisplayName(userId);
-        return ResponseEntity.ok(displayName);
-    }
-
 }

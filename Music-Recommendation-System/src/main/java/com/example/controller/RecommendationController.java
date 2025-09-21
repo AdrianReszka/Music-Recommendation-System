@@ -50,5 +50,10 @@ public class RecommendationController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/user/{username}")
+    public List<TrackDto> getRecommendationsForUser(@PathVariable String username) {
+        return recommendationService.getRecommendationsForUser(username);
+    }
+
 }
 

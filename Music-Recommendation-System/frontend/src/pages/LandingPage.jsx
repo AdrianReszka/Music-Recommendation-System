@@ -1,7 +1,12 @@
 import React from 'react';
 import LoginWithSpotifyButton from '../components/LoginWithSpotifyButton';
 
-export default function LandingPage({ onSpotifyLogin }) {
+export default function LandingPage() {
+
+    const handleLogin = () => {
+        window.location.href = "/musicapp/spotify/login";
+    };
+
     return (
         <main className="w-screen h-screen flex flex-col justify-center items-center bg-[#1f1f1f] text-white text-center px-4">
 
@@ -13,7 +18,9 @@ export default function LandingPage({ onSpotifyLogin }) {
                 Bridge your Last.fm loved tracks to Spotify playlists.
             </p>
 
-            <LoginWithSpotifyButton onClick={onSpotifyLogin} />
+            <LoginWithSpotifyButton onClick={handleLogin}>
+                Login to Spotify
+            </LoginWithSpotifyButton>
 
             <p className="mt-10 text-base sm:text-lg text-gray-500">
                 We only ask for the scopes needed to create your playlist.

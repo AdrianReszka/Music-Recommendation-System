@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import MainMenu from './pages/MainMenu';
-import LandingPage from './pages/LandingPage';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import MainMenu from "./pages/MainMenu";
+import SpotifyCallbackPage from "./pages/SpotifyCallbackPage";
 
 function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const isLoggedIn = !!localStorage.getItem("spotify_username");
 
-    const handleSpotifyLogin = () => {
-        setIsLoggedIn(true);
-    };
-
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-    };
-
-    return isLoggedIn
-        ? <MainMenu onLogout={handleLogout} />
-        : <LandingPage onSpotifyLogin={handleSpotifyLogin} />;
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/callback" element={<SpotifyCallbackPage />} />
+                <Route path="/beatbridge" element={<MainMenu />} />
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

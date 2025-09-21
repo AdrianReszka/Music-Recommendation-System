@@ -56,36 +56,38 @@ export default function PlaylistsPanel() {
         );
     };
 
-    const handleSave = async () => {
-        if (!selectedList || selectedTracks.length === 0) {
-            alert("Please select a list and at least one track.");
+    const handleSavePlaylist = async () => {
+        const username = localStorage.getItem("spotify_username");
+        if (!username) {
+            alert("Spotify user not logged in");
             return;
         }
 
-        const username = selectedList.replace("Recommended tracks for ", "");
+        const trackUris = tracks
+            .filter(track => selectedTrackIds.includes(track.id))
+            .map(track => `spotify:track:${track.spotifyId}`);
+
+        if (trackUris.length === 0) {
+            alert("Please select at least one track");
+            return;
+        }
 
         try {
-            const res = await fetch("/musicapp/spotify/playlist", {
+            const res = await fetch(`/musicapp/spotify/save-playlist?username=${username}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username,
-                    name: fixedPlaylistName,
-                    tracks: selectedTracks.map(id => `spotify:track:${id}`)
-                })
+                body: JSON.stringify(trackUris),
             });
 
             if (res.ok) {
-                console.log("Playlist saved successfully");
-                setSaved(true);
+                alert("Playlist created successfully!");
             } else {
-                const text = await res.text();
-                console.error("Error saving playlist:", text);
-                alert("Backend error: " + text);
+                const err = await res.text();
+                alert("Failed to create playlist: " + err);
             }
         } catch (err) {
-            console.error("Error saving playlist", err);
-            alert("Failed to save playlist");
+            console.error("Error creating playlist:", err);
+            alert("Error creating playlist");
         }
     };
 
@@ -110,7 +112,7 @@ export default function PlaylistsPanel() {
                             />
                         </div>
                         <div className="w-full sm:w-auto">
-                            <PanelButton onClick={handleSave}>
+                            <PanelButton onClick={handleSavePlaylist}>
                                 Save Playlist
                             </PanelButton>
                         </div>

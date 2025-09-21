@@ -1,8 +1,8 @@
 package com.example.service;
 
-import com.example.model.CreateSpotifyPlaylistRequest;
-import com.example.model.User;
-import com.example.repository.UserRepository;
+import com.example.model.SpotifyUser;
+import com.example.repository.PlaylistRepository;
+import com.example.repository.SpotifyUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -11,9 +11,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -29,21 +30,21 @@ public class SpotifyService {
     @Value("${spotify.redirect-uri}")
     private String redirectUri;
 
-    private final UserRepository userRepository;
-
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public URI buildAuthorizationUri(Integer userId) {
-        String scopes = URLEncoder.encode("playlist-modify-private playlist-modify-public", StandardCharsets.UTF_8);
-        return URI.create("https://accounts.spotify.com/authorize" +
+    private final SpotifyUserRepository spotifyUserRepository;
+
+    public String buildLoginUrl() {
+        return "https://accounts.spotify.com/authorize" +
                 "?client_id=" + clientId +
                 "&response_type=code" +
                 "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8) +
-                "&scope=" + scopes +
-                "&state=" + userId);
+                "&scope=playlist-modify-public playlist-modify-private user-read-private";
     }
 
-    public void exchangeCodeForToken(String code, Long userId) {
+    public SpotifyUser exchangeCodeAndSaveUser(String code) {
+        String tokenUrl = "https://accounts.spotify.com/api/token";
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setBasicAuth(clientId, clientSecret);
@@ -55,86 +56,78 @@ public class SpotifyService {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(form, headers);
 
-        ResponseEntity<Map> response = new RestTemplate().exchange(
-                "https://accounts.spotify.com/api/token",
-                HttpMethod.POST,
-                request,
-                Map.class
-        );
+        ResponseEntity<Map> tokenResponse = restTemplate.postForEntity(tokenUrl, request, Map.class);
+        Map body = tokenResponse.getBody();
 
-        String accessToken = (String) response.getBody().get("access_token");
+        if (body == null || !body.containsKey("access_token")) {
+            throw new RuntimeException("No access token returned from Spotify");
+        }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setSpotifyToken(accessToken);
-        userRepository.save(user);
+        String accessToken = (String) body.get("access_token");
+        String refreshToken = (String) body.get("refresh_token");
+        Integer expiresIn = (Integer) body.get("expires_in"); // seconds
+
+        HttpHeaders authHeaders = new HttpHeaders();
+        authHeaders.setBearerAuth(accessToken);
+        HttpEntity<Void> userRequest = new HttpEntity<>(authHeaders);
+
+        ResponseEntity<Map> userResponse = restTemplate.exchange("https://api.spotify.com/v1/me", HttpMethod.GET, userRequest, Map.class);
+        Map userBody = userResponse.getBody();
+
+        if (userBody == null || !userBody.containsKey("id")) {
+            throw new RuntimeException("Spotify user info not found");
+        }
+
+        String spotifyId = (String) userBody.get("id");
+        String displayName = (String) userBody.getOrDefault("display_name", spotifyId);
+
+        SpotifyUser user = spotifyUserRepository.findBySpotifyId(spotifyId).orElse(new SpotifyUser());
+        user.setSpotifyId(spotifyId);
+        user.setDisplayName(displayName);
+        user.setAccessToken(accessToken);
+        user.setRefreshToken(refreshToken);
+        user.setTokenExpiresAt(java.time.LocalDateTime.now().plusSeconds(expiresIn));
+
+        return spotifyUserRepository.save(user);
     }
 
-    public String getDisplayName(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void createPlaylistWithTracks(String spotifyId, List<String> trackUris) {
+        SpotifyUser user = spotifyUserRepository.findBySpotifyId(spotifyId)
+                .orElseThrow(() -> new RuntimeException("Spotify user not found"));
 
-        String token = user.getSpotifyToken();
-        if (token == null) throw new RuntimeException("User not connected to Spotify");
+        String accessToken = user.getAccessToken();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+        String playlistName = "BeatBridge Recommendations Playlist";
+        String createPlaylistUrl = "https://api.spotify.com/v1/users/" + spotifyId + "/playlists";
 
-        HttpEntity<Void> request = new HttpEntity<>(headers);
-
-        ResponseEntity<Map> response = restTemplate.exchange(
-                "https://api.spotify.com/v1/me",
-                HttpMethod.GET,
-                request,
-                Map.class
-        );
-
-        return (String) response.getBody().get("display_name");
-    }
-
-
-    public void createPlaylistForUser(CreateSpotifyPlaylistRequest request, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        String accessToken = user.getSpotifyToken();
-        if (accessToken == null) throw new RuntimeException("Spotify token not found");
+        Map<String, Object> playlistBody = new HashMap<>();
+        playlistBody.put("name", playlistName);
+        playlistBody.put("description", "Generated by BeatBridge");
+        playlistBody.put("public", false);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        HttpEntity<?> entity = new HttpEntity<>(headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<Map> profile = restTemplate.exchange(
-                "https://api.spotify.com/v1/me",
-                HttpMethod.GET,
-                entity,
-                Map.class
-        );
-        String spotifyUserId = (String) profile.getBody().get("id");
+        HttpEntity<Map<String, Object>> playlistRequest = new HttpEntity<>(playlistBody, headers);
+        ResponseEntity<Map> playlistResponse = restTemplate.postForEntity(createPlaylistUrl, playlistRequest, Map.class);
 
-        Map<String, Object> playlistPayload = Map.of(
-                "name", request.getName(),
-                "description", "Generated by BeatBridge",
-                "public", false
-        );
-        HttpEntity<Map<String, Object>> playlistEntity = new HttpEntity<>(playlistPayload, headers);
+        if (!playlistResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to create playlist");
+        }
 
-        ResponseEntity<Map> created = restTemplate.exchange(
-                "https://api.spotify.com/v1/users/" + spotifyUserId + "/playlists",
-                HttpMethod.POST,
-                playlistEntity,
-                Map.class
-        );
-        String playlistId = (String) created.getBody().get("id");
+        String playlistId = (String) playlistResponse.getBody().get("id");
 
-        Map<String, Object> tracksPayload = Map.of("uris", request.getTrackUris());
-        HttpEntity<Map<String, Object>> tracksEntity = new HttpEntity<>(tracksPayload, headers);
+        String addTracksUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
 
-        restTemplate.exchange(
-                "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks",
-                HttpMethod.POST,
-                tracksEntity,
-                Void.class
-        );
+        Map<String, Object> tracksBody = Map.of("uris", trackUris);
+        HttpEntity<Map<String, Object>> tracksRequest = new HttpEntity<>(tracksBody, headers);
+
+        ResponseEntity<Void> addTracksResponse = restTemplate.postForEntity(addTracksUrl, tracksRequest, Void.class);
+
+        if (!addTracksResponse.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Failed to add tracks to playlist");
+        }
     }
 }
+
