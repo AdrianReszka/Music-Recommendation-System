@@ -1,51 +1,61 @@
-import React, { useEffect, useState } from "react";
-import DropdownSelect from "../components/DropdownSelect.jsx";
+import React, { useState, useEffect } from 'react';
 import PanelButton from "../components/PanelButton.jsx";
+import DropdownSelect from "../components/DropdownSelect.jsx";
 
-export default function PlaylistsPanel() {
-    const [usernames, setUsernames] = useState([]);
-    const [selectedList, setSelectedList] = useState("");
+export default function RecommendationsPanel() {
+    const [users, setUsers] = useState([]);
+    const [selectedList, setSelectedList] = useState('');
+    const [recommendations, setRecommendations] = useState([]);
     const [selectedTracks, setSelectedTracks] = useState([]);
-    const [tracks, setTracks] = useState([]);
+    const [createdFrom, setCreatedFrom] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [saved, setSaved] = useState(false);
-
-    const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
     useEffect(() => {
-        const fetchUsernames = async () => {
+        const fetchUsers = async () => {
             try {
-                const res = await fetch("/musicapp/recommendations/users");
+                const res = await fetch("/musicapp/users");
                 const data = await res.json();
-                setUsernames(data);
+                setUsers(data.map(u => u.lastfmUsername));
             } catch (err) {
-                console.error("Failed to fetch usernames", err);
+                console.error("Failed to fetch users", err);
             }
         };
-        fetchUsernames();
+        fetchUsers();
     }, []);
 
     const handleListChange = async (listName) => {
         setSelectedList(listName);
-        setSelectedTracks([]);
-        setSaved(false);
 
-        const username = listName.replace("Recommended tracks for ", "");
+        const username = listName
+            .replace(" loved tracks", "")
+            .replace("Recommended tracks for ", "");
+
+        let endpoint = "";
+        if (listName.includes("loved tracks")) {
+            endpoint = `/musicapp/user-tracks/${username}`;
+        } else if (listName.includes("Recommended tracks")) {
+            endpoint = `/musicapp/recommendations/user/${username}`;
+        } else {
+            console.warn("Unknown list selected");
+            return;
+        }
 
         try {
-            const res = await fetch(`/musicapp/recommendations/user/${username}`);
+            const res = await fetch(endpoint);
             if (res.ok) {
                 const data = await res.json();
-                setTracks(data);
+                setRecommendations(data);
             } else {
-                const text = await res.text();
-                console.error("Failed to fetch recommendations:", text);
-                setTracks([]);
+                console.error("Failed to fetch tracks, status:", res.status);
+                setRecommendations([]);
             }
         } catch (err) {
-            console.error("Error fetching tracks", err);
-            setTracks([]);
+            console.error("Failed to fetch tracks", err);
+            setRecommendations([]);
         }
+
+        setSelectedTracks([]);
+        setCreatedFrom("");
     };
 
     const toggleTrack = (trackId) => {
@@ -56,42 +66,31 @@ export default function PlaylistsPanel() {
         );
     };
 
-    const handleSavePlaylist = async () => {
-        const spotifyId = localStorage.getItem("spotify_id");
-        if (!spotifyId) {
-            alert("Spotify user not logged in");
-            return;
-        }
+    const handleGenerate = async () => {
+        const username = selectedList.replace(" loved tracks", "");
 
-        const trackUris = tracks
-            .filter(track => selectedTracks.includes(track.id))
-            .map(track => `spotify:track:${track.spotifyId}`);
-
-        if (trackUris.length === 0) {
-            alert("Please select at least one track");
-            return;
-        }
-
+        setRecommendations([]);
+        setSelectedTracks([]);
+        setCreatedFrom("");
         setIsLoading(true);
-        setSaved(false);
-        setTracks([]);
 
         try {
-            const res = await fetch(`/musicapp/spotify/save-playlist?spotifyId=${spotifyId}`, {
+            const res = await fetch(`/musicapp/lastfm/similar?username=${username}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(trackUris),
+                body: JSON.stringify(selectedTracks)
             });
-
             if (res.ok) {
-                setSaved(true);
+                const data = await res.json();
+                setCreatedFrom(username);
             } else {
                 const err = await res.text();
-                alert("Failed to create playlist: " + err);
+                console.error("Failed to generate recommendations:", err);
+                alert("Backend error: " + err);
             }
         } catch (err) {
-            console.error("Error creating playlist:", err);
-            alert("Error creating playlist");
+            console.error("Error generating recommendations", err);
+            alert("Failed to generate recommendations");
         } finally {
             setIsLoading(false);
         }
@@ -99,62 +98,61 @@ export default function PlaylistsPanel() {
 
     return (
         <div className="w-full h-full flex items-center justify-center px-4">
-            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md
-                            p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
+            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
 
                 <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
-                    Save Playlist
+                    Generate Recommendations
                 </h2>
 
                 <div className="flex flex-col gap-4">
-                    <label className="text-gray-300 text-xl">Select recommendations list</label>
+                    <label className="text-gray-300 text-xl">Select loved tracks list</label>
                     <div className="w-full flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <DropdownSelect
-                                options={usernames.map(u => `Recommended tracks for ${u}`)}
+                                options={users.map(u => `${u} loved tracks`)}
                                 placeholder="Choose a list"
                                 value={selectedList}
                                 onChange={handleListChange}
                             />
                         </div>
                         <div className="w-full sm:w-auto">
-                            <PanelButton onClick={handleSavePlaylist}>
-                                Save Playlist
+                            <PanelButton onClick={handleGenerate}>
+                                Generate recommendations
                             </PanelButton>
                         </div>
                     </div>
+
+                    {isLoading ? (
+                        <p className="text-gray-300 text-xl">Generating recommendations...</p>
+                    ) : createdFrom ? (
+                        <p className="text-gray-300 text-xl">
+                            Saved as: <span className="font-bold text-white">"Recommended tracks for {createdFrom}"</span>
+                        </p>
+                    ) : null}
                 </div>
 
-                {isLoading ? (
-                    <p className="text-gray-300 text-xl text-center">Saving playlist...</p>
-                ) : saved ? (
-                    <p className="text-green-400 text-lg text-center font-semibold">
-                        Playlist saved as: "{fixedPlaylistName}"
-                    </p>
-                ) : (
-                    tracks.length > 0 && (
-                        <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
-                            {tracks.map((track, idx) => (
-                                <label
-                                    key={idx}
-                                    className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                                               bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
-                                               transition focus:outline-none"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedTracks.includes(track.id)}
-                                        onChange={() => toggleTrack(track.id)}
-                                        className="w-5 h-5 accent-white"
-                                    />
-                                    <div className="flex flex-col">
-                                        <span className="text-white text-lg font-bold">{track.title}</span>
-                                        <span className="text-gray-400 text-sm">{track.artist}</span>
-                                    </div>
-                                </label>
-                            ))}
-                        </div>
-                    )
+                {recommendations.length > 0 && (
+                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
+                        {recommendations.map((track, idx) => (
+                            <label
+                                key={idx}
+                                className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
+                                           bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
+                                           transition focus:outline-none"
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={selectedTracks.includes(track.id)}
+                                    onChange={() => toggleTrack(track.id)}
+                                    className="w-5 h-5 accent-white"
+                                />
+                                <div className="flex flex-col">
+                                    <span className="text-white text-lg font-bold">{track.title}</span>
+                                    <span className="text-gray-400 text-sm">{track.artist}</span>
+                                </div>
+                            </label>
+                        ))}
+                    </div>
                 )}
             </div>
         </div>
