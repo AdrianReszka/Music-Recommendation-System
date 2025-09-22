@@ -23,12 +23,13 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+        working-directory: ./Music-Recommendation-System
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: '${{ github.workspace }}/Music-Recommendation-System/target/*.jar'
+          path: 'Music-Recommendation-System/target/*.jar'
 
   deploy:
     runs-on: windows-latest
@@ -59,3 +60,4 @@ jobs:
           package: '*.jar'
 
           
+
