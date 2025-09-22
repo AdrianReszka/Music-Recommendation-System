@@ -24,15 +24,15 @@ jobs:
       - name: Show repo structure (debug)
         run: ls -R
 
-      - name: Build with Maven (debug mode)
-        run: mvn clean package -DskipTests -X
-        working-directory: ./Music-Recommendation-System/Music-Recommendation-System
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
+        working-directory: ./Music-Recommendation-System   
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: 'Music-Recommendation-System/Music-Recommendation-System/target/*.jar'
+          path: 'Music-Recommendation-System/target/*.jar'   
 
   deploy:
     runs-on: ubuntu-latest
