@@ -21,8 +21,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
+      - name: Show repo structure (debug)
+        run: ls -R
+
+      - name: Build with Maven (debug mode)
+        run: mvn clean package -DskipTests -X
         working-directory: ./Music-Recommendation-System/Music-Recommendation-System
 
       - name: Upload artifact for deployment job
