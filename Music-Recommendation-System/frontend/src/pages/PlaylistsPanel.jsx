@@ -7,6 +7,7 @@ export default function PlaylistsPanel() {
     const [selectedList, setSelectedList] = useState("");
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [tracks, setTracks] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [saved, setSaved] = useState(false);
 
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
@@ -35,7 +36,6 @@ export default function PlaylistsPanel() {
             const res = await fetch(`/musicapp/recommendations/user/${username}`);
             if (res.ok) {
                 const data = await res.json();
-                console.log("Fetched recommendations for:", username, data);
                 setTracks(data);
             } else {
                 const text = await res.text();
@@ -57,14 +57,14 @@ export default function PlaylistsPanel() {
     };
 
     const handleSavePlaylist = async () => {
-        const username = localStorage.getItem("spotify_username");
-        if (!username) {
+        const spotifyId = localStorage.getItem("spotify_id");
+        if (!spotifyId) {
             alert("Spotify user not logged in");
             return;
         }
 
         const trackUris = tracks
-            .filter(track => selectedTrackIds.includes(track.id))
+            .filter(track => selectedTracks.includes(track.id))
             .map(track => `spotify:track:${track.spotifyId}`);
 
         if (trackUris.length === 0) {
@@ -72,15 +72,18 @@ export default function PlaylistsPanel() {
             return;
         }
 
+        setIsLoading(true);
+        setSaved(false);
+
         try {
-            const res = await fetch(`/musicapp/spotify/save-playlist?username=${username}`, {
+            const res = await fetch(`/musicapp/spotify/save-playlist?spotifyId=${spotifyId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(trackUris),
             });
 
             if (res.ok) {
-                alert("Playlist created successfully!");
+                setSaved(true);
             } else {
                 const err = await res.text();
                 alert("Failed to create playlist: " + err);
@@ -88,6 +91,8 @@ export default function PlaylistsPanel() {
         } catch (err) {
             console.error("Error creating playlist:", err);
             alert("Error creating playlist");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -143,11 +148,15 @@ export default function PlaylistsPanel() {
                     </div>
                 )}
 
-                {saved && (
-                    <p className="text-green-400 text-lg text-center font-semibold">
-                        ✅ Playlist saved as: "{fixedPlaylistName}"
+                {isLoading ? (
+                    <p className="text-gray-300 text-xl text-center">
+                        Saving playlist...
                     </p>
-                )}
+                ) : saved ? (
+                    <p className="text-green-400 text-lg text-center font-semibold">
+                        Playlist saved as: "{fixedPlaylistName}"
+                    </p>
+                ) : null}
             </div>
         </div>
     );

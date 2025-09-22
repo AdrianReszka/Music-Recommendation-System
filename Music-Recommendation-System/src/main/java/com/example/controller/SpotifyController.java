@@ -1,6 +1,5 @@
 package com.example.controller;
 
-import com.example.model.SpotifyUser;
 import com.example.service.SpotifyService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +26,25 @@ public class SpotifyController {
 
     @GetMapping("/callback")
     public void callback(@RequestParam String code, HttpServletResponse response) throws IOException {
-        SpotifyUser user = spotifyService.exchangeCodeAndSaveUser(code);
-        response.sendRedirect("http://localhost:5173/spotify-callback?username=" + URLEncoder.encode(user.getSpotifyId(), StandardCharsets.UTF_8));
+        String accessToken = spotifyService.exchangeCodeForAccessToken(code);
+
+        var userInfo = spotifyService.getSpotifyUserInfo(accessToken);
+        String spotifyId = userInfo.get("id");
+        String displayName = userInfo.get("display_name");
+
+        spotifyService.saveOrUpdateSpotifyUser(spotifyId, displayName, accessToken);
+
+        response.sendRedirect("http://localhost:5173/spotify-callback"
+                + "?spotifyId=" + URLEncoder.encode(spotifyId, StandardCharsets.UTF_8)
+                + "&username=" + URLEncoder.encode(displayName, StandardCharsets.UTF_8));
     }
 
     @PostMapping("/save-playlist")
-    public ResponseEntity<Void> savePlaylist(@RequestParam String username, @RequestBody List<String> trackUris) {
-        spotifyService.createPlaylistWithTracks(username, trackUris);
+    public ResponseEntity<Void> savePlaylist(
+            @RequestParam String spotifyId,
+            @RequestBody List<String> trackUris
+    ) {
+        spotifyService.createPlaylistWithTracks(spotifyId, trackUris);
         return ResponseEntity.ok().build();
     }
 }

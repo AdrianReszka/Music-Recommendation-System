@@ -1,21 +1,27 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function SpotifyCallbackPage() {
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const username = urlParams.get("username");
+        const spotifyId = searchParams.get("spotifyId");
+        const username = searchParams.get("username");
 
-        if (username) {
+        if (spotifyId && username) {
+            localStorage.setItem("spotify_id", spotifyId);
             localStorage.setItem("spotify_username", username);
             navigate("/beatbridge");
         } else {
-            alert("Login failed.");
+            alert("Spotify login failed");
             navigate("/");
         }
-    }, [navigate]);
+    }, [navigate, searchParams]);
 
-    return <p className="text-white text-center mt-10">Logging in to Spotify...</p>;
+    return (
+        <div className="text-white text-2xl text-center mt-20">
+            Logging in with Spotify...
+        </div>
+    );
 }
