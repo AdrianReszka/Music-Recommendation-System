@@ -11,12 +11,17 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
+
 @RestController
 @RequestMapping("/musicapp/spotify")
 @RequiredArgsConstructor
 public class SpotifyController {
 
     private final SpotifyService spotifyService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @GetMapping("/login")
     public void login(HttpServletResponse response) throws IOException {
@@ -34,7 +39,7 @@ public class SpotifyController {
 
         spotifyService.saveOrUpdateSpotifyUser(spotifyId, displayName, accessToken);
 
-        response.sendRedirect("http://localhost:5173/spotify-callback"
+        response.sendRedirect(frontendUrl + "/callback"
                 + "?spotifyId=" + URLEncoder.encode(spotifyId, StandardCharsets.UTF_8)
                 + "&username=" + URLEncoder.encode(displayName, StandardCharsets.UTF_8));
     }
