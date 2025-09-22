@@ -8,31 +8,27 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
-      contents: read
+      contents: read 
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java version
         uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'temurin'
-
-      - name: Show repo structure (debug)
-        run: ls -R
+          distribution: 'microsoft'
 
       - name: Build with Maven
-        run: mvn clean package -DskipTests
-        working-directory: ./Music-Recommendation-System   
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: 'Music-Recommendation-System/target/*.jar'   
+          path: '${{ github.workspace }}/Music-Recommendation-System/target/*.jar'
 
   deploy:
     runs-on: windows-latest
@@ -62,3 +58,4 @@ jobs:
           slot-name: 'Production'
           package: '*.jar'
 
+          
