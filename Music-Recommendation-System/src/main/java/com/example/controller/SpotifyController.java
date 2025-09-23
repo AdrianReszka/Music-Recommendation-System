@@ -20,9 +20,6 @@ public class SpotifyController {
 
     private final SpotifyService spotifyService;
 
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
-
     @GetMapping("/login")
     public void login(HttpServletResponse response) throws IOException {
         String loginUrl = spotifyService.buildLoginUrl();
@@ -39,7 +36,7 @@ public class SpotifyController {
 
         spotifyService.saveOrUpdateSpotifyUser(spotifyId, displayName, accessToken);
 
-        response.sendRedirect(frontendUrl + "/callback"
+        response.sendRedirect("https://beatbridge-c4hbh6bgcjdggra5.polandcentral-01.azurewebsites.net/beatbridge"
                 + "?spotifyId=" + URLEncoder.encode(spotifyId, StandardCharsets.UTF_8)
                 + "&username=" + URLEncoder.encode(displayName, StandardCharsets.UTF_8));
     }
