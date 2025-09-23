@@ -63,11 +63,14 @@ export default function PlaylistsPanel() {
             return;
         }
 
-        const trackUris = tracks
+        const selectedDtos = tracks
             .filter(track => selectedTracks.includes(track.id))
-            .map(track => `spotify:track:${track.spotifyId}`);
+            .map(track => ({
+                title: track.title,
+                artist: track.artist
+            }));
 
-        if (trackUris.length === 0) {
+        if (selectedDtos.length === 0) {
             alert("Please select at least one track");
             return;
         }
@@ -79,7 +82,7 @@ export default function PlaylistsPanel() {
             const res = await fetch(`/musicapp/spotify/save-playlist?spotifyId=${spotifyId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(trackUris),
+                body: JSON.stringify(selectedDtos),
             });
 
             if (res.ok) {
