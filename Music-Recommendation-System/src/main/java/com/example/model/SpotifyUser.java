@@ -19,8 +19,10 @@ public class SpotifyUser {
 
     private String displayName;
 
+    @Column(name = "access_token", length = 2000)
     private String accessToken;
 
+    @Column(name = "refresh_token", length = 2000)
     private String refreshToken;
 
     private LocalDateTime tokenExpiresAt;

@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.TrackDto;
 import com.example.service.SpotifyService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequestMapping("/musicapp/spotify")
@@ -42,11 +42,12 @@ public class SpotifyController {
     }
 
     @PostMapping("/save-playlist")
-    public ResponseEntity<Void> savePlaylist(
+    public ResponseEntity<String> savePlaylist(
             @RequestParam String spotifyId,
-            @RequestBody List<String> trackUris
+            @RequestParam String playlistName,
+            @RequestBody List<TrackDto> tracks
     ) {
-        spotifyService.createPlaylistWithTracks(spotifyId, trackUris);
-        return ResponseEntity.ok().build();
+        spotifyService.createPlaylistWithTracks(spotifyId, playlistName, tracks);
+        return ResponseEntity.ok("Playlist created and tracks added successfully!");
     }
 }
