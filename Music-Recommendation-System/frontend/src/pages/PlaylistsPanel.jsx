@@ -75,6 +75,8 @@ export default function PlaylistsPanel() {
             return;
         }
 
+        setTracks([]);
+        setSelectedTracks([]);
         setIsLoading(true);
         setSaved(false);
 
@@ -87,9 +89,6 @@ export default function PlaylistsPanel() {
 
             if (res.ok) {
                 setSaved(true);
-                // chowamy listę i odznaczamy utwory
-                setTracks([]);
-                setSelectedTracks([]);
             } else {
                 const err = await res.text();
                 alert("Failed to create playlist: " + err);
