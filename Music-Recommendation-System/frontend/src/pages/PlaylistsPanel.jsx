@@ -87,6 +87,9 @@ export default function PlaylistsPanel() {
 
             if (res.ok) {
                 setSaved(true);
+                // chowamy listę i odznaczamy utwory
+                setTracks([]);
+                setSelectedTracks([]);
             } else {
                 const err = await res.text();
                 alert("Failed to create playlist: " + err);
@@ -125,6 +128,14 @@ export default function PlaylistsPanel() {
                             </PanelButton>
                         </div>
                     </div>
+
+                    {isLoading ? (
+                        <p className="text-gray-300 text-xl">Saving playlist...</p>
+                    ) : saved ? (
+                        <p className="text-gray-300 text-xl">
+                            Saved as: <span className="font-bold text-white">"{fixedPlaylistName}"</span>
+                        </p>
+                    ) : null}
                 </div>
 
                 {tracks.length > 0 && (
@@ -150,16 +161,6 @@ export default function PlaylistsPanel() {
                         ))}
                     </div>
                 )}
-
-                {isLoading ? (
-                    <p className="text-gray-300 text-xl text-center">
-                        Saving playlist...
-                    </p>
-                ) : saved ? (
-                    <p className="text-green-400 text-lg text-center font-semibold">
-                        Playlist saved as: "{fixedPlaylistName}"
-                    </p>
-                ) : null}
             </div>
         </div>
     );
