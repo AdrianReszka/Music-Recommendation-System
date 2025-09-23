@@ -42,12 +42,15 @@ public class SpotifyController {
     }
 
     @PostMapping("/save-playlist")
-    public ResponseEntity<String> savePlaylist(
-            @RequestParam String spotifyId,
-            @RequestParam String playlistName,
-            @RequestBody List<TrackDto> tracks
-    ) {
-        spotifyService.createPlaylistWithTracks(spotifyId, playlistName, tracks);
-        return ResponseEntity.ok("Playlist created and tracks added successfully!");
+    public ResponseEntity<String> savePlaylist(@RequestParam String spotifyId, @RequestBody List<String> trackUris) {
+        String fixedPlaylistName = "BeatBridge Recommendations Playlist";
+
+        spotifyService.createPlaylistWithTracks(
+                spotifyId,
+                fixedPlaylistName,
+                trackUris
+        );
+
+        return ResponseEntity.ok("Playlist created successfully as: " + fixedPlaylistName);
     }
 }

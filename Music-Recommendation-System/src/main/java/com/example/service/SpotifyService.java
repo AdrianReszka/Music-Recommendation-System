@@ -122,7 +122,7 @@ public class SpotifyService {
         return "spotify:track:" + id;
     }
 
-    public void createPlaylistWithTracks(String spotifyId, String playlistName, List<TrackDto> tracks) {
+    public void createPlaylistWithTracks(String spotifyId, String playlistName, List<String> trackUris) {
         SpotifyUser user = spotifyUserRepository.findBySpotifyId(spotifyId)
                 .orElseThrow(() -> new RuntimeException("Spotify user not found"));
 
@@ -148,19 +148,8 @@ public class SpotifyService {
 
         String playlistId = (String) response.getBody().get("id");
 
-        List<String> trackUris = tracks.stream()
-                .map(t -> searchSpotifyTrack(accessToken, t.getTitle(), t.getArtist()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        if (trackUris.isEmpty()) {
-            throw new RuntimeException("No tracks could be mapped to Spotify URIs");
-        }
-
         String addTracksUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
         Map<String, Object> tracksBody = Map.of("uris", trackUris);
-
-        System.out.println("Dodaję utwory do playlisty: " + trackUris);
 
         restTemplate.postForEntity(addTracksUrl, new HttpEntity<>(tracksBody, headers), Void.class);
     }
