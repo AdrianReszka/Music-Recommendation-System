@@ -36,7 +36,7 @@ public class SpotifyController {
 
         spotifyService.saveOrUpdateSpotifyUser(spotifyId, displayName, accessToken);
 
-        response.sendRedirect("https://beatbridge-c4hbh6bgcjdggra5.polandcentral-01.azurewebsites.net/beatbridge"
+        response.sendRedirect("https://beatbridge-c4hbh6bgcjdggra5.polandcentral-01.azurewebsites.net/callback"
                 + "?spotifyId=" + URLEncoder.encode(spotifyId, StandardCharsets.UTF_8)
                 + "&username=" + URLEncoder.encode(displayName, StandardCharsets.UTF_8));
     }

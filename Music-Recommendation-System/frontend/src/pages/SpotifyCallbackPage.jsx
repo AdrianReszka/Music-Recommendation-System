@@ -9,10 +9,13 @@ export default function SpotifyCallbackPage() {
         const spotifyId = searchParams.get("spotifyId");
         const username = searchParams.get("username");
 
+        console.log("spotifyId:", spotifyId);
+        console.log("username:", username);
+
         if (spotifyId && username) {
             localStorage.setItem("spotify_id", spotifyId);
             localStorage.setItem("spotify_username", username);
-            navigate("/beatbridge");
+            navigate("/beatbridge", { replace: true });
         } else {
             alert("Spotify login failed");
             navigate("/");
