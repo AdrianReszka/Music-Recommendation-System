@@ -42,7 +42,8 @@ public class SpotifyService {
                 "?client_id=" + clientId +
                 "&response_type=code" +
                 "&redirect_uri=" + URLEncoder.encode(redirectUri, StandardCharsets.UTF_8) +
-                "&scope=playlist-modify-public playlist-modify-private user-read-private";
+                "&scope=playlist-modify-public playlist-modify-private user-read-private" +
+                "&show_dialog=true";
     }
 
     public String exchangeCodeForAccessToken(String code) {

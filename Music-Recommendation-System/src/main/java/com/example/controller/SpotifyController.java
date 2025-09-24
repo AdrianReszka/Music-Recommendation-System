@@ -53,6 +53,9 @@ public class SpotifyController {
     public ResponseEntity<Void> logout(@RequestParam String spotifyId) {
         spotifyUserRepository.findBySpotifyId(spotifyId).ifPresent(user -> {
             user.setAccessToken(null);
+            user.setDisplayName(null);
+            user.setSpotifyId(null);
+
             spotifyUserRepository.save(user);
         });
         return ResponseEntity.ok().build();
