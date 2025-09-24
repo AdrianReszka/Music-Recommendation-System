@@ -3,15 +3,28 @@ import LandingPage from "./pages/LandingPage";
 import MainMenu from "./pages/MainMenu";
 import SpotifyCallbackPage from "./pages/SpotifyCallbackPage";
 
-function App() {
-    const isLoggedIn = !!localStorage.getItem("spotify_username");
+function PrivateRoute({ children }) {
+    const spotifyId = localStorage.getItem("spotify_id");
+    if (!spotifyId) {
+        return <Navigate to="/" replace />;
+    }
+    return children;
+}
 
+function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/callback" element={<SpotifyCallbackPage />} />
-                <Route path="/beatbridge" element={<MainMenu />} />
+                <Route
+                    path="/beatbridge"
+                    element={
+                        <PrivateRoute>
+                            <MainMenu />
+                        </PrivateRoute>
+                    }
+                />
                 <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </Router>
