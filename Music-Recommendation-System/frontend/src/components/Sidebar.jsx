@@ -3,10 +3,20 @@ import SidebarButton from './SidebarButton';
 
 function Sidebar({ setActiveView }) {
 
-    const handleLogout = () => {
-        localStorage.removeItem("spotify_username");
-        localStorage.removeItem("spotify_access_token");
-        localStorage.removeItem("spotify_refresh_token");
+    const handleLogout = async () => {
+        const spotifyId = localStorage.getItem("spotify_id");
+        if (spotifyId) {
+            try {
+                await fetch(`/musicapp/spotify/logout?spotifyId=${spotifyId}`, {
+                    method: "POST",
+                });
+            } catch (err) {
+                console.error("Logout failed", err);
+            }
+        }
+
+        localStorage.removeItem("spotify_id");
+        localStorage.removeItem("username");
 
         window.location.href = "/";
     };

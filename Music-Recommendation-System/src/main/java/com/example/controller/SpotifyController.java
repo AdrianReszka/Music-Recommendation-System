@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.TrackDto;
+import com.example.repository.SpotifyUserRepository;
 import com.example.service.SpotifyService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 public class SpotifyController {
 
     private final SpotifyService spotifyService;
+    private final SpotifyUserRepository spotifyUserRepository;
 
     @GetMapping("/login")
     public void login(HttpServletResponse response) throws IOException {
@@ -45,5 +47,14 @@ public class SpotifyController {
     public ResponseEntity<String> savePlaylist(@RequestParam String spotifyId, @RequestBody List<TrackDto> tracks) {
         spotifyService.createPlaylistWithTracks(spotifyId, tracks);
         return ResponseEntity.ok("Playlist created and tracks added successfully!");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestParam String spotifyId) {
+        spotifyUserRepository.findBySpotifyId(spotifyId).ifPresent(user -> {
+            user.setAccessToken(null);
+            spotifyUserRepository.save(user);
+        });
+        return ResponseEntity.ok().build();
     }
 }
