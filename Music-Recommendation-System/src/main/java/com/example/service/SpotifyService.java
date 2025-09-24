@@ -89,8 +89,12 @@ public class SpotifyService {
     }
 
     public void saveOrUpdateSpotifyUser(String spotifyId, String displayName, String accessToken) {
+        if (spotifyId == null || accessToken == null) {
+            throw new IllegalArgumentException("Cannot save Spotify user without ID or access token");
+        }
+
         SpotifyUser user = spotifyUserRepository.findBySpotifyId(spotifyId)
-                .orElseGet(SpotifyUser::new);
+                .orElse(new SpotifyUser());
 
         user.setSpotifyId(spotifyId);
         user.setDisplayName(displayName);
@@ -171,5 +175,10 @@ public class SpotifyService {
         System.out.println("Dodaję do playlisty " + FIXED_PLAYLIST_NAME + " utwory: " + trackUris);
 
         restTemplate.postForEntity(addTracksUrl, new HttpEntity<>(tracksBody, headers), Void.class);
+    }
+
+    public void logout(String spotifyId) {
+        spotifyUserRepository.findBySpotifyId(spotifyId)
+                .ifPresent(spotifyUserRepository::delete);
     }
 }
