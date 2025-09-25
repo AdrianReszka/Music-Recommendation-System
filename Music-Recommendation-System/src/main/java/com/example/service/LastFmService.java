@@ -41,8 +41,19 @@ public class LastFmService {
                 "&api_key=" + apiKey +
                 "&format=json";
 
-        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+        ResponseEntity<Map> response;
+        try {
+            response = restTemplate.getForEntity(url, Map.class);
+        } catch (Exception e) {
+            System.err.println("Failed to import loved tracks for user " + username + ": " + e.getMessage());
+            return List.of();
+        }
+
         Map body = response.getBody();
+        if (body == null || body.containsKey("error")) {
+            System.out.println("Last.fm error for user " + username + ": " + body);
+            return List.of();
+        }
 
         if (body == null || !body.containsKey("lovedtracks")) return List.of();
 
