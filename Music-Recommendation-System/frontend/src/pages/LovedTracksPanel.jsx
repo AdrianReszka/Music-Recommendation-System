@@ -21,24 +21,10 @@ export default function LovedTracksPanel() {
                 method: 'GET',
             });
             if (response.ok) {
-
-                const data = await response.json();
-                if (!data || data.length === 0) {
-                    alert(`No loved tracks found for user "${username}".`);
-                    return;
-                }
-
                 setSavedAs(`${username} loved tracks`);
             } else {
                 const text = await response.text();
-
-                if (text.includes("User not found")) {
-                    alert("This Last.fm user does not exist.");
-                } else if (text.includes("lovedtracks")) {
-                    alert("This user has no loved tracks.");
-                } else {
-                    alert("Failed to fetch loved tracks. Please try again.");
-                }
+                alert(`Failed to fetch loved tracks: ${text}`);
             }
         } catch (err) {
             console.error("Error while fetching loved tracks:", err);
