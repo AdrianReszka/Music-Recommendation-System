@@ -23,12 +23,15 @@ export default function LovedTracksPanel() {
             });
             if (response.ok) {
                 setSavedAs(`${username} loved tracks`);
+<<<<<<< HEAD
 
                 if (!data || data.length === 0) {
                     alert(`No loved tracks found for user "${username}". Please check the username.`);
                     return;
                 }
 
+=======
+>>>>>>> parent of 67dad8c (Trying to handle LastFm user errors)
             } else {
                 const text = await response.text();
                 alert(`Failed to fetch loved tracks: ${text}`);
