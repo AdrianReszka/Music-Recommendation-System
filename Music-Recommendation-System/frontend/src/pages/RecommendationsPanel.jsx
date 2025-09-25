@@ -67,6 +67,15 @@ export default function RecommendationsPanel() {
     };
 
     const handleGenerate = async () => {
+        if (!selectedList) {
+            alert("Please select a list before generating recommendations.");
+            return;
+        }
+        if (selectedTracks.length === 0) {
+            alert("Please select at least one track.");
+            return;
+        }
+
         const username = selectedList.replace(" loved tracks", "");
 
         setRecommendations([]);

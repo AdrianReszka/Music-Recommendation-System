@@ -57,6 +57,11 @@ export default function PlaylistsPanel() {
     };
 
     const handleSavePlaylist = async () => {
+        if (!selectedList) {
+            alert("Please select a recommendations list first.");
+            return;
+        }
+
         const spotifyId = localStorage.getItem("spotify_id");
         if (!spotifyId) {
             alert("Spotify user not logged in");
