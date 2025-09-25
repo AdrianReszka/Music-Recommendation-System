@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import UsernameInput from '../components/UsernameInput';
 import PanelButton from "../components/PanelButton.jsx";
+import {data} from "react-router-dom";
 
 export default function LovedTracksPanel() {
     const [username, setUsername] = useState('');
@@ -22,6 +23,12 @@ export default function LovedTracksPanel() {
             });
             if (response.ok) {
                 setSavedAs(`${username} loved tracks`);
+
+                if (!data || data.length === 0) {
+                    alert(`No loved tracks found for user "${username}". Please check the username.`);
+                    return;
+                }
+
             } else {
                 const text = await response.text();
                 alert(`Failed to fetch loved tracks: ${text}`);

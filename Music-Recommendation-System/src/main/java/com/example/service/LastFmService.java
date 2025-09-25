@@ -35,28 +35,52 @@ public class LastFmService {
     private final RecommendationRepository recommendationRepository;
 
     public List<TrackDto> fetchLovedTracks(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return List.of();
+        }
+
         String url = "https://ws.audioscrobbler.com/2.0/" +
                 "?method=user.getlovedtracks" +
                 "&user=" + username +
                 "&api_key=" + apiKey +
                 "&format=json";
 
-        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-        Map body = response.getBody();
+        ResponseEntity<Map> response;
+        try {
+            response = restTemplate.getForEntity(url, Map.class);
+        } catch (Exception e) {
+            System.err.println("Failed to call Last.fm API: " + e.getMessage());
+            return List.of();
+        }
 
-        if (body == null || !body.containsKey("lovedtracks")) return List.of();
+        Map body = response.getBody();
+        if (body == null || !body.containsKey("lovedtracks")) {
+            return List.of();
+        }
 
         Map lovedTracks = (Map) body.get("lovedtracks");
-        List<Map<String, Object>> trackList = (List<Map<String, Object>>) lovedTracks.get("track");
+        if (lovedTracks == null || !lovedTracks.containsKey("track")) {
+            return List.of();
+        }
+
+        Object trackObj = lovedTracks.get("track");
+        if (!(trackObj instanceof List<?> trackList)) {
+            return List.of();
+        }
 
         List<Track> savedTracks = new ArrayList<>();
 
-        for (Map<String, Object> trackMap : trackList) {
+        for (Object obj : trackList) {
+            if (!(obj instanceof Map<?, ?> trackMap)) continue;
+
             String title = (String) trackMap.get("name");
+            if (title == null || title.isEmpty()) continue;
+
             String mbid = (String) trackMap.get("mbid");
 
             Map<String, Object> artistMap = (Map<String, Object>) trackMap.get("artist");
-            String artist = (String) artistMap.get("name");
+            String artist = artistMap != null ? (String) artistMap.get("name") : null;
+            if (artist == null || artist.isEmpty()) continue;
 
             Optional<Track> existing = trackRepository.findByTitleAndArtist(title, artist);
             Track track = existing.orElseGet(Track::new);
@@ -84,8 +108,9 @@ public class LastFmService {
                         Set<Tag> tags = new HashSet<>();
 
                         for (Object o : tagListRaw) {
-                            if (o instanceof Map tagMap) {
+                            if (o instanceof Map<?, ?> tagMap) {
                                 String tagName = (String) tagMap.get("name");
+                                if (tagName == null || tagName.isEmpty()) continue;
 
                                 Tag tag = tagRepository.findByName(tagName)
                                         .orElseGet(() -> {
