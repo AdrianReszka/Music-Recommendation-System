@@ -21,6 +21,13 @@ export default function LovedTracksPanel() {
                 method: 'GET',
             });
             if (response.ok) {
+
+                const data = await response.json();
+                if (!data || data.length === 0) {
+                    alert(`No loved tracks found for user "${username}".`);
+                    return;
+                }
+
                 setSavedAs(`${username} loved tracks`);
             } else {
                 const text = await response.text();
