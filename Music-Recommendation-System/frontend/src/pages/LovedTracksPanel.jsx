@@ -25,15 +25,19 @@ export default function LovedTracksPanel() {
                 setSavedAs(`${username} loved tracks`);
             } else if (response.status === 204) {
                 alert(`User "${username}" exists but has no loved tracks.`);
+                setUsername("");
             } else if (response.status === 404) {
                 alert(`User "${username}" was not found on Last.fm.`);
+                setUsername("");
             } else {
                 const text = await response.text();
                 alert(`Unexpected error: ${text}`);
+                setUsername("");
             }
         } catch (err) {
             console.error("Error while fetching loved tracks:", err);
             alert("Error while fetching loved tracks");
+            setUsername("");
         } finally {
             setIsLoading(false);
         }
