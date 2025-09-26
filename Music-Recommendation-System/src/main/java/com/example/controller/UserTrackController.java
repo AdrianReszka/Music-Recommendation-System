@@ -6,6 +6,7 @@ import com.example.service.UserTrackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -36,9 +37,16 @@ public class UserTrackController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("User not found on Last.fm: " + username);
 
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("User not found on Last.fm: " + username);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body("Error while calling Last.fm API");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to import loved tracks: " + e.getMessage());
+                    .body("Failed to import loved tracks");
         }
     }
 
