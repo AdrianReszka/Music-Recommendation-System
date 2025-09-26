@@ -44,10 +44,16 @@ public class LastFmService {
         ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
         Map body = response.getBody();
 
-        if (body == null || !body.containsKey("lovedtracks")) return List.of();
+        if (body == null || !body.containsKey("lovedtracks")) {
+            throw new NoSuchElementException("Last.fm user not found: " + username);
+        }
 
         Map lovedTracks = (Map) body.get("lovedtracks");
         List<Map<String, Object>> trackList = (List<Map<String, Object>>) lovedTracks.get("track");
+
+        if (trackList == null || trackList.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         List<Track> savedTracks = new ArrayList<>();
 

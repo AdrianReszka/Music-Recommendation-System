@@ -20,11 +20,19 @@ export default function LovedTracksPanel() {
             const response = await fetch(`/musicapp/user-tracks/import?username=${username}`, {
                 method: 'GET',
             });
-            if (response.ok) {
+
+            if (response.status === 200) {
                 setSavedAs(`${username} loved tracks`);
+                alert(`Imported loved tracks for user: ${username}`);
+            } else if (response.status === 204) {
+                const text = await response.text();
+                alert(text || `User "${username}" exists but has no loved tracks.`);
+            } else if (response.status === 404) {
+                const text = await response.text();
+                alert(text || `User "${username}" was not found on Last.fm.`);
             } else {
                 const text = await response.text();
-                alert(`Failed to fetch loved tracks: ${text}`);
+                alert(`Unexpected error: ${text}`);
             }
         } catch (err) {
             console.error("Error while fetching loved tracks:", err);

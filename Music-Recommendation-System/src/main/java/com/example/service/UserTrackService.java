@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,13 @@ public class UserTrackService {
         userTrackRepository.deleteById(id);
     }
 
-    public void importLovedTracksFromLastFm(String username) {
+    public List<TrackDto> importLovedTracksFromLastFm(String username) {
+        List<TrackDto> lovedTrackDtos = lastFmService.fetchLovedTracks(username);
+
+        if (lovedTrackDtos.isEmpty()) {
+            return lovedTrackDtos;
+        }
+
         User user = userRepository.findByLastfmUsername(username)
                 .orElseGet(() -> {
                     User newUser = new User();
@@ -53,25 +60,25 @@ public class UserTrackService {
                     return userRepository.save(newUser);
                 });
 
-        List<TrackDto> lovedTrackDtos = lastFmService.fetchLovedTracks(username);
-
         for (TrackDto dto : lovedTrackDtos) {
             Track track = trackRepository.findByTitleAndArtist(dto.getTitle(), dto.getArtist())
                     .orElseThrow(() -> new RuntimeException("Track not found after fetch: " + dto.getTitle()));
 
-            UserTrack userTrack = new UserTrack();
-            userTrack.setUser(user);
-            userTrack.setTrack(track);
-
-            userTrackRepository.save(userTrack);
-
+            boolean exists = userTrackRepository.existsByUserAndTrack(user, track);
+            if (!exists) {
+                UserTrack userTrack = new UserTrack();
+                userTrack.setUser(user);
+                userTrack.setTrack(track);
+                userTrackRepository.save(userTrack);
+            }
         }
 
+        return lovedTrackDtos;
     }
 
     public List<TrackDto> getTracksForUser(String username) {
         User user = userRepository.findByLastfmUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+                .orElseThrow(() -> new NoSuchElementException("User not found: " + username));
 
         List<UserTrack> userTracks = userTrackRepository.findByUser(user);
 

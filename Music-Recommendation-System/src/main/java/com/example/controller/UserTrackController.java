@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/musicapp/user-tracks")
@@ -22,8 +23,19 @@ public class UserTrackController {
     @GetMapping("/import")
     public ResponseEntity<String> importLovedTracks(@RequestParam String username) {
         try {
-            userTrackService.importLovedTracksFromLastFm(username);
+            List<TrackDto> tracks = userTrackService.importLovedTracksFromLastFm(username);
+
+            if (tracks.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body("User exists but has no loved tracks");
+            }
+
             return ResponseEntity.ok("Imported loved tracks for user: " + username);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found on Last.fm: " + username);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to import loved tracks: " + e.getMessage());
@@ -31,13 +43,24 @@ public class UserTrackController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<List<TrackDto>> getUserTracks(@PathVariable String username) {
+    public ResponseEntity<?> getUserTracks(@PathVariable String username) {
         try {
             List<TrackDto> tracks = userTrackService.getTracksForUser(username);
+
+            if (tracks.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                        .body("User exists but has no saved tracks");
+            }
+
             return ResponseEntity.ok(tracks);
-        } catch (Exception e) {
+
+        } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(List.of());
+                    .body("User not found: " + username);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to fetch tracks: " + e.getMessage());
         }
     }
 
