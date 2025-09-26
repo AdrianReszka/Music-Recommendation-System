@@ -22,7 +22,9 @@ function Sidebar({ setActiveView }) {
     };
 
     return (
-        <div className="h-full w-full max-w-[400px] min-w-[240px] bg-[#2a2a2a] shadow-md flex flex-col">
+        <div className="h-full bg-[#2a2a2a] shadow-md flex flex-col
+                w-1/4 sm:w-1/3 md:w-1/4 lg:w-1/3
+                min-w-[180px] max-w-[400px]">
 
             <div className="flex-1 flex flex-col items-center justify-center">
                 <SidebarButton text="Loved Tracks" onClick={() => setActiveView('loved')} />
