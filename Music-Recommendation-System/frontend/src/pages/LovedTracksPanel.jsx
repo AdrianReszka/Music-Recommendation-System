@@ -21,15 +21,10 @@ export default function LovedTracksPanel() {
                 method: 'GET',
             });
 
-            if (response.status === 200) {
-                setSavedAs(`${username} loved tracks`);
-                alert(`Imported loved tracks for user: ${username}`);
-            } else if (response.status === 204) {
-                const text = await response.text();
-                alert(text || `User "${username}" exists but has no loved tracks.`);
+            if (response.status === 204) {
+                alert(`User "${username}" exists but has no loved tracks.`);
             } else if (response.status === 404) {
-                const text = await response.text();
-                alert(text || `User "${username}" was not found on Last.fm.`);
+                alert(`User "${username}" was not found on Last.fm.`);
             } else {
                 const text = await response.text();
                 alert(`Unexpected error: ${text}`);
@@ -44,7 +39,8 @@ export default function LovedTracksPanel() {
 
     return (
         <div className="w-full h-full flex items-center justify-center px-4">
-            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly">
+            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md p-6
+                sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
 
                 <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
                     Download Loved Tracks

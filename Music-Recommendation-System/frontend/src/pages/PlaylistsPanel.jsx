@@ -109,7 +109,7 @@ export default function PlaylistsPanel() {
     return (
         <div className="w-full h-full flex items-center justify-center px-4">
             <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md
-                            p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly">
+                            p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
 
                 <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
                     Save Playlist
