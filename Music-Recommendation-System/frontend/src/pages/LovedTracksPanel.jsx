@@ -21,7 +21,9 @@ export default function LovedTracksPanel() {
                 method: 'GET',
             });
 
-            if (response.status === 204) {
+            if (response.status === 200) {
+                setSavedAs(`${username} loved tracks`);
+            } else if (response.status === 204) {
                 alert(`User "${username}" exists but has no loved tracks.`);
             } else if (response.status === 404) {
                 alert(`User "${username}" was not found on Last.fm.`);
