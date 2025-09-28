@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 import LovedTracksPanel from "./LovedTracksPanel.jsx";
@@ -8,11 +9,18 @@ import PlaylistsPanel from "./PlaylistsPanel.jsx";
 function MainMenu() {
     const [activeView, setActiveView] = useState('loved');
     const [username, setUsername] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
+        const spotifyId = localStorage.getItem("spotify_id");
+        if (!spotifyId) {
+            navigate("/", { replace: true });
+            return;
+        }
+
         const storedUsername = localStorage.getItem("spotify_username");
         setUsername(storedUsername || 'Unknown');
-    }, []);
+    }, [navigate]);
 
     return (
         <>
