@@ -12,27 +12,14 @@ function MainMenu() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const spotifyId = localStorage.getItem("spotify_id");
+        const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) {
             navigate("/", { replace: true });
             return;
         }
 
-        const storedUsername = localStorage.getItem("spotify_username");
+        const storedUsername = sessionStorage.getItem("spotify_username");
         setUsername(storedUsername || 'Unknown');
-    }, [navigate]);
-
-    useEffect(() => {
-        const handlePopState = () => {
-            navigate("/beatbridge", { replace: true });
-        };
-
-        window.history.pushState(null, "", window.location.href);
-        window.addEventListener("popstate", handlePopState);
-
-        return () => {
-            window.removeEventListener("popstate", handlePopState);
-        };
     }, [navigate]);
 
     return (

@@ -1,7 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import LoginWithSpotifyButton from '../components/LoginWithSpotifyButton';
 
 export default function LandingPage() {
+
+    useEffect(() => {
+        sessionStorage.removeItem("spotify_id");
+        sessionStorage.removeItem("spotify_username");
+    }, []);
 
     const handleLogin = () => {
         window.location.href = "/musicapp/spotify/login";

@@ -4,7 +4,7 @@ import MainMenu from "./pages/MainMenu";
 import SpotifyCallbackPage from "./pages/SpotifyCallbackPage";
 
 function PrivateRoute({ children }) {
-    const spotifyId = localStorage.getItem("spotify_id");
+    const spotifyId = sessionStorage.getItem("spotify_id");
     if (!spotifyId) {
         return <Navigate to="/" replace />;
     }
