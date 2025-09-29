@@ -4,7 +4,7 @@ import SidebarButton from './SidebarButton';
 function Sidebar({ setActiveView }) {
 
     const handleLogout = async () => {
-        const spotifyId = localStorage.getItem("spotify_id");
+        const spotifyId = sessionStorage.getItem("spotify_id");
         if (spotifyId) {
             try {
                 await fetch(`/musicapp/spotify/logout?spotifyId=${spotifyId}`, {
@@ -15,8 +15,8 @@ function Sidebar({ setActiveView }) {
             }
         }
 
-        localStorage.removeItem("spotify_id");
-        localStorage.removeItem("username");
+        sessionStorage.removeItem("spotify_id");
+        sessionStorage.removeItem("username");
 
         window.location.href = "/";
     };
