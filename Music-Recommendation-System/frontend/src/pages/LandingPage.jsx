@@ -16,7 +16,7 @@ export default function LandingPage() {
         <main className="w-screen h-screen flex flex-col justify-center items-center bg-[#1f1f1f] text-white text-center px-4">
 
             <h1 className="text-7xl sm:text-8xl font-extrabold mb-10">
-                BeatBridge
+                Beat Bridge
             </h1>
 
             <p className="text-gray-300 text-2xl sm:text-3xl mb-14">
