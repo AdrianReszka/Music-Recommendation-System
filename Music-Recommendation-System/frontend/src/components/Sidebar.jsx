@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { useNavigate } from "react-router-dom";
 import SidebarButton from './SidebarButton';
 
 function Sidebar({ setActiveView }) {
+    const navigate = useNavigate();
 
     const handleLogout = async () => {
         const spotifyId = sessionStorage.getItem("spotify_id");
@@ -16,9 +18,9 @@ function Sidebar({ setActiveView }) {
         }
 
         sessionStorage.removeItem("spotify_id");
-        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("spotify_username");
 
-        window.location.href = "/";
+        navigate("/", { replace: true });
     };
 
     return (
