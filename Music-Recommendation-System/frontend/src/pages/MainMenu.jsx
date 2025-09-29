@@ -15,11 +15,10 @@ function MainMenu() {
         const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) {
             navigate("/", { replace: true });
-            return;
         }
 
         const storedUsername = sessionStorage.getItem("spotify_username");
-        setUsername(storedUsername || 'Unknown');
+        setUsername(storedUsername || "Unknown");
     }, [navigate]);
 
     return (
