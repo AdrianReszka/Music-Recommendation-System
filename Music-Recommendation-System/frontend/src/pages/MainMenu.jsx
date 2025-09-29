@@ -22,6 +22,19 @@ function MainMenu() {
         setUsername(storedUsername || 'Unknown');
     }, [navigate]);
 
+    useEffect(() => {
+        const handlePopState = () => {
+            navigate("/beatbridge", { replace: true });
+        };
+
+        window.history.pushState(null, "", window.location.href);
+        window.addEventListener("popstate", handlePopState);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopState);
+        };
+    }, [navigate]);
+
     return (
         <>
             <TopBar username={username} />
