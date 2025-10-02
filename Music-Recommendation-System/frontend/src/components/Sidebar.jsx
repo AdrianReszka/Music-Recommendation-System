@@ -6,7 +6,7 @@ function Sidebar({ setActiveView }) {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        const spotifyId = localStorage.getItem("spotify_id");
+        const spotifyId = sessionStorage.getItem("spotify_id");
         if (spotifyId) {
             try {
                 await fetch(`/musicapp/spotify/logout?spotifyId=${spotifyId}`, {
@@ -17,8 +17,8 @@ function Sidebar({ setActiveView }) {
             }
         }
 
-        localStorage.removeItem("spotify_id");
-        localStorage.removeItem("spotify_username");
+        sessionStorage.removeItem("spotify_id");
+        sessionStorage.removeItem("spotify_username");
 
         navigate("/", { replace: true });
     };

@@ -62,7 +62,7 @@ export default function PlaylistsPanel() {
             return;
         }
 
-        const spotifyId = localStorage.getItem("spotify_id");
+        const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) {
             alert("Spotify user not logged in");
             return;
