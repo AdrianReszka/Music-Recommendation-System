@@ -45,8 +45,19 @@ public class SpotifyController {
 
     @PostMapping("/save-playlist")
     public ResponseEntity<String> savePlaylist(@RequestParam String spotifyId, @RequestBody List<TrackDto> tracks) {
-        spotifyService.createPlaylistWithTracks(spotifyId, tracks);
-        return ResponseEntity.ok("Playlist created and tracks added successfully!");
+        System.out.println("Received Spotify ID: " + spotifyId);
+
+        if (spotifyId == null || spotifyId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Spotify ID is missing");
+        }
+
+        try {
+            spotifyService.createPlaylistWithTracks(spotifyId, tracks);
+            return ResponseEntity.ok("Playlist created and tracks added successfully!");
+        } catch (Exception e) {
+            System.err.println("Error creating playlist: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error creating playlist");
+        }
     }
 
     @PostMapping("/logout")
