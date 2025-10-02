@@ -4,8 +4,8 @@ import LoginWithSpotifyButton from '../components/LoginWithSpotifyButton';
 export default function LandingPage() {
 
     useEffect(() => {
-        sessionStorage.removeItem("spotify_id");
-        sessionStorage.removeItem("spotify_username");
+        localStorage.removeItem("spotify_id");
+        localStorage.removeItem("spotify_username");
     }, []);
 
     const handleLogin = () => {
