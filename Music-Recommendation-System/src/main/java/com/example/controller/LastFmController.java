@@ -19,8 +19,8 @@ public class LastFmController {
     }
 
     @GetMapping("/loved")
-    public ResponseEntity<List<TrackDto>> getLovedTracks(@RequestParam String username) {
-        List<TrackDto> lovedTracks = lastFmService.fetchLovedTracks(username);
+    public ResponseEntity<List<TrackDto>> getLovedTracks(@RequestParam String username, @RequestParam String spotifyId) {
+        List<TrackDto> lovedTracks = lastFmService.fetchLovedTracks(username, spotifyId);
         return ResponseEntity.ok(lovedTracks);
     }
 

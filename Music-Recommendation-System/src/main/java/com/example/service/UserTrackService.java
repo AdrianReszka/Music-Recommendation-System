@@ -46,8 +46,8 @@ public class UserTrackService {
         userTrackRepository.deleteById(id);
     }
 
-    public List<TrackDto> importLovedTracksFromLastFm(String username) {
-        List<TrackDto> lovedTrackDtos = lastFmService.fetchLovedTracks(username);
+    public List<TrackDto> importLovedTracksFromLastFm(String username, String spotifyId) {
+        List<TrackDto> lovedTrackDtos = lastFmService.fetchLovedTracks(username,  spotifyId);
 
         if (lovedTrackDtos.isEmpty()) {
             return lovedTrackDtos;

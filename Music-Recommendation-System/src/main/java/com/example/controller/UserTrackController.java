@@ -22,9 +22,9 @@ public class UserTrackController {
     }
 
     @GetMapping("/import")
-    public ResponseEntity<String> importLovedTracks(@RequestParam String username) {
+    public ResponseEntity<String> importLovedTracks(@RequestParam String username, @RequestParam String spotifyId) {
         try {
-            List<TrackDto> tracks = userTrackService.importLovedTracksFromLastFm(username);
+            List<TrackDto> tracks = userTrackService.importLovedTracksFromLastFm(username,  spotifyId);
 
             if (tracks.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)

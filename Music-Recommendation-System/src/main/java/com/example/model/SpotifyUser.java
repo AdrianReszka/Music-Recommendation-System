@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,6 +28,9 @@ public class SpotifyUser {
     private String refreshToken;
 
     private LocalDateTime tokenExpiresAt;
+
+    @OneToMany(mappedBy = "spotifyUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<User> users = new HashSet<>();
 }
 
 

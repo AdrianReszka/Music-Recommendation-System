@@ -10,6 +10,7 @@ import com.example.repository.RecommendationRepository;
 import com.example.repository.TagRepository;
 import com.example.repository.TrackRepository;
 import com.example.repository.UserRepository;
+import com.example.repository.SpotifyUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,9 @@ public class LastFmService {
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
+    private final SpotifyUserRepository spotifyUserRepository;
 
-    public List<TrackDto> fetchLovedTracks(String username) {
+    public List<TrackDto> fetchLovedTracks(String username, String spotifyId) {
         String url = "https://ws.audioscrobbler.com/2.0/" +
                 "?method=user.getlovedtracks" +
                 "&user=" + username +
@@ -53,6 +55,20 @@ public class LastFmService {
 
         if (trackList == null || trackList.isEmpty()) {
             return Collections.emptyList();
+        }
+
+        User user = userRepository.findByLastfmUsername(username)
+                .orElseGet(() -> {
+                    User newUser = new User();
+                    newUser.setLastfmUsername(username);
+                    return userRepository.save(newUser);
+                });
+
+        if (spotifyId != null && user.getSpotifyUser() == null) {
+            spotifyUserRepository.findBySpotifyId(spotifyId).ifPresent(spotifyUser -> {
+                user.setSpotifyUser(spotifyUser);
+                userRepository.save(user);
+            });
         }
 
         List<Track> savedTracks = new ArrayList<>();

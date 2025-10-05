@@ -13,11 +13,17 @@ export default function LovedTracksPanel() {
             return;
         }
 
+        const spotifyId = sessionStorage.getItem("spotify_id");
+        if (!spotifyId) {
+            alert("You must be logged in with Spotify before importing loved tracks.");
+            return;
+        }
+
         setIsLoading(true);
         setSavedAs("");
 
         try {
-            const response = await fetch(`/musicapp/user-tracks/import?username=${username}`, {
+            const response = await fetch(`/musicapp/user-tracks/import?username=${username}&spotifyId=${spotifyId}`, {
                 method: 'GET',
             });
 
