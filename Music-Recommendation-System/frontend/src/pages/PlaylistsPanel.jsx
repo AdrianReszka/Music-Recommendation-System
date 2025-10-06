@@ -30,10 +30,11 @@ export default function PlaylistsPanel() {
         setSelectedTracks([]);
         setSaved(false);
 
+        const spotifyId = sessionStorage.getItem("spotify_id");
         const username = listName.replace("Recommended tracks for ", "");
 
         try {
-            const res = await fetch(`/musicapp/recommendations/user/${username}`);
+            const res = await fetch(`/musicapp/recommendations/user/${username}?spotifyId=${spotifyId}`);
             if (res.ok) {
                 const data = await res.json();
                 setTracks(data);
