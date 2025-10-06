@@ -11,16 +11,31 @@ export default function RecommendationsPanel() {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchLinkedUsers = async () => {
+            const spotifyId = sessionStorage.getItem("spotify_id");
+            if (!spotifyId) {
+                console.warn("No Spotify user logged in");
+                setUsers([]);
+                return;
+            }
+
             try {
-                const res = await fetch("/musicapp/users");
+                const res = await fetch(`/musicapp/users?spotifyId=${spotifyId}`);
+                if (!res.ok) {
+                    console.error("Failed to fetch linked users");
+                    setUsers([]);
+                    return;
+                }
+
                 const data = await res.json();
                 setUsers(data.map(u => u.lastfmUsername));
             } catch (err) {
                 console.error("Failed to fetch users", err);
+                setUsers([]);
             }
         };
-        fetchUsers();
+
+        fetchLinkedUsers();
     }, []);
 
     const handleListChange = async (listName) => {
