@@ -9,6 +9,8 @@ export default function DropdownSelect({ options, placeholder, value, onChange }
         setIsOpen(false);
     };
 
+    console.log("Dropdown options:", options);
+
     return (
         <div className="relative w-full">
             <div

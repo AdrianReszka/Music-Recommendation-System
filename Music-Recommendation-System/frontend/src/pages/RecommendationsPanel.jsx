@@ -28,6 +28,7 @@ export default function RecommendationsPanel() {
                 }
 
                 const data = await res.json();
+                console.log("Linked users (raw):", data);
                 setUsers(data.map(u => u.lastfmUsername));
             } catch (err) {
                 console.error("Failed to fetch users", err);
@@ -42,9 +43,13 @@ export default function RecommendationsPanel() {
         const spotifyId = sessionStorage.getItem("spotify_id");
         setSelectedList(listName);
 
+        console.log("Selected list name:", listName);
+
         const username = listName
             .replace(" loved tracks", "")
             .replace("Recommended tracks for ", "");
+
+        console.log("Extracted username:", username);
 
         let endpoint = "";
         if (listName.includes("loved tracks")) {

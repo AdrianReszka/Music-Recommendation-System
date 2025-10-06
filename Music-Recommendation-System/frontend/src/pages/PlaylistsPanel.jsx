@@ -13,6 +13,7 @@ export default function PlaylistsPanel() {
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
     useEffect(() => {
+
         const fetchLinkedUsers = async () => {
             try {
                 const spotifyId = sessionStorage.getItem("spotify_id");
@@ -23,8 +24,10 @@ export default function PlaylistsPanel() {
                 }
 
                 const res = await fetch(`/musicapp/users?spotifyId=${spotifyId}`);
+                console.log("Fetching users for spotifyId:", spotifyId);
                 if (res.ok) {
                     const data = await res.json();
+                    console.log("Linked users (raw):", data);
                     setUsernames(data.map(u => u.lastfmUsername));
                 } else {
                     console.error("Failed to fetch linked users, status:", res.status);

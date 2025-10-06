@@ -17,8 +17,11 @@ public class UserController {
     }
 
     @GetMapping
-    public List<String> getUsers(@RequestParam(required = false) String spotifyId) {
-        return userService.getUsersLinkedToSpotify(spotifyId);
+    public List<User> getAllUsers(@RequestParam(required = false) String spotifyId) {
+        if (spotifyId != null && !spotifyId.isEmpty()) {
+            return userService.getUsersLinkedToSpotify(spotifyId);
+        }
+        return userService.getAll();
     }
 
     @GetMapping("/{id}")
