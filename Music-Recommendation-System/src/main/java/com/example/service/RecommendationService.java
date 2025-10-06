@@ -47,7 +47,6 @@ public class RecommendationService {
             Optional<Track> trackOpt = trackRepository.findByTitleAndArtist(dto.getTitle(), dto.getArtist());
             trackOpt.ifPresent(track -> {
 
-
                 Recommendation rec = new Recommendation();
                 rec.setUser(user);
                 rec.setTrack(track);

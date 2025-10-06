@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,7 @@ public class SpotifyUser {
     private LocalDateTime tokenExpiresAt;
 
     @OneToMany(mappedBy = "spotifyUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<SpotifyUserLink> links = new HashSet<>();
 }
 
