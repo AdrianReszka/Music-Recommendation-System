@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -19,13 +23,10 @@ public class User {
     @Column(unique = true)
     private String lastfmUsername;
 
-    private String spotifyId;
-
     @Column(length = 4000)
     private String spotifyToken;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spotify_user_id")
-    private SpotifyUser spotifyUser;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SpotifyUserLink> links = new HashSet<>();
 }
+

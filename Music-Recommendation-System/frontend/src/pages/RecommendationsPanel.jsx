@@ -24,6 +24,7 @@ export default function RecommendationsPanel() {
     }, []);
 
     const handleListChange = async (listName) => {
+        const spotifyId = sessionStorage.getItem("spotify_id");
         setSelectedList(listName);
 
         const username = listName
@@ -32,9 +33,9 @@ export default function RecommendationsPanel() {
 
         let endpoint = "";
         if (listName.includes("loved tracks")) {
-            endpoint = `/musicapp/user-tracks/${username}`;
+            endpoint = `/musicapp/user-tracks/${username}?spotifyId=${spotifyId}`;
         } else if (listName.includes("Recommended tracks")) {
-            endpoint = `/musicapp/recommendations/user/${username}`;
+            endpoint = `/musicapp/recommendations/user/${username}?spotifyId=${spotifyId}`;
         } else {
             console.warn("Unknown list selected");
             return;
@@ -76,6 +77,7 @@ export default function RecommendationsPanel() {
             return;
         }
 
+        const spotifyId = sessionStorage.getItem("spotify_id");
         const username = selectedList.replace(" loved tracks", "");
 
         setRecommendations([]);
@@ -84,7 +86,7 @@ export default function RecommendationsPanel() {
         setIsLoading(true);
 
         try {
-            const res = await fetch(`/musicapp/lastfm/similar?username=${username}`, {
+            const res = await fetch(`/musicapp/lastfm/similar?username=${username}&spotifyId=${spotifyId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(selectedTracks)

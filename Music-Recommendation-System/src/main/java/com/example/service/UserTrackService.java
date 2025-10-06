@@ -2,13 +2,12 @@ package com.example.service;
 
 import com.example.dto.TagDto;
 import com.example.dto.TrackDto;
-import com.example.model.Tag;
-import com.example.model.Track;
-import com.example.model.User;
-import com.example.model.UserTrack;
+import com.example.model.*;
 import com.example.repository.TrackRepository;
 import com.example.repository.UserRepository;
 import com.example.repository.UserTrackRepository;
+import com.example.repository.SpotifyUserLinkRepository;
+import com.example.repository.SpotifyUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +23,19 @@ public class UserTrackService {
     private final UserTrackRepository userTrackRepository;
     private final TrackRepository trackRepository;
     private final LastFmService lastFmService;
+    private final SpotifyUserRepository spotifyUserRepository;
+    private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
     public UserTrackService(UserRepository userRepository,
                             UserTrackRepository userTrackRepository,
-                            LastFmService lastFmService, TrackRepository trackRepository) {
+                            LastFmService lastFmService, TrackRepository trackRepository,  SpotifyUserLinkRepository spotifyUserLinkRepository,
+                            SpotifyUserRepository spotifyUserRepository) {
         this.userRepository = userRepository;
         this.userTrackRepository = userTrackRepository;
         this.lastFmService = lastFmService;
         this.trackRepository = trackRepository;
+        this.spotifyUserRepository = spotifyUserRepository;
+        this.spotifyUserLinkRepository = spotifyUserLinkRepository;
     }
 
     public List<UserTrack> getAll() {
@@ -60,6 +64,19 @@ public class UserTrackService {
                     return userRepository.save(newUser);
                 });
 
+        if (spotifyId != null) {
+            SpotifyUser spotifyUser = spotifyUserRepository.findBySpotifyId(spotifyId)
+                    .orElseThrow(() -> new RuntimeException("Spotify user not found: " + spotifyId));
+
+            boolean exists = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, user);
+            if (!exists) {
+                SpotifyUserLink link = new SpotifyUserLink();
+                link.setSpotifyUser(spotifyUser);
+                link.setUser(user);
+                spotifyUserLinkRepository.save(link);
+            }
+        }
+
         for (TrackDto dto : lovedTrackDtos) {
             Track track = trackRepository.findByTitleAndArtist(dto.getTitle(), dto.getArtist())
                     .orElseThrow(() -> new RuntimeException("Track not found after fetch: " + dto.getTitle()));
@@ -76,9 +93,19 @@ public class UserTrackService {
         return lovedTrackDtos;
     }
 
-    public List<TrackDto> getTracksForUser(String username) {
+    public List<TrackDto> getTracksForUser(String username, String spotifyId) {
         User user = userRepository.findByLastfmUsername(username)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + username));
+
+        if (spotifyId != null) {
+            SpotifyUser spotifyUser = spotifyUserRepository.findBySpotifyId(spotifyId)
+                    .orElseThrow(() -> new NoSuchElementException("Spotify user not found: " + spotifyId));
+
+            boolean hasAccess = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, user);
+            if (!hasAccess) {
+                throw new SecurityException("Access denied: Spotify user not linked with this Last.fm account");
+            }
+        }
 
         List<UserTrack> userTracks = userTrackRepository.findByUser(user);
 

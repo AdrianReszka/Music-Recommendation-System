@@ -2,15 +2,13 @@ package com.example.service;
 
 import com.example.dto.TagDto;
 import com.example.dto.TrackDto;
-import com.example.model.Recommendation;
-import com.example.model.Tag;
-import com.example.model.Track;
-import com.example.model.User;
+import com.example.model.*;
 import com.example.repository.RecommendationRepository;
 import com.example.repository.TagRepository;
 import com.example.repository.TrackRepository;
 import com.example.repository.UserRepository;
 import com.example.repository.SpotifyUserRepository;
+import com.example.repository.SpotifyUserLinkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +33,7 @@ public class LastFmService {
     private final UserRepository userRepository;
     private final RecommendationRepository recommendationRepository;
     private final SpotifyUserRepository spotifyUserRepository;
+    private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
     public List<TrackDto> fetchLovedTracks(String username, String spotifyId) {
         String url = "https://ws.audioscrobbler.com/2.0/" +
@@ -64,10 +63,15 @@ public class LastFmService {
                     return userRepository.save(newUser);
                 });
 
-        if (spotifyId != null && user.getSpotifyUser() == null) {
+        if (spotifyId != null) {
             spotifyUserRepository.findBySpotifyId(spotifyId).ifPresent(spotifyUser -> {
-                user.setSpotifyUser(spotifyUser);
-                userRepository.save(user);
+                boolean exists = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, user);
+                if (!exists) {
+                    SpotifyUserLink link = new SpotifyUserLink();
+                    link.setSpotifyUser(spotifyUser);
+                    link.setUser(user);
+                    spotifyUserLinkRepository.save(link);
+                }
             });
         }
 
@@ -150,7 +154,21 @@ public class LastFmService {
                 .toList();
     }
 
-    public List<TrackDto> fetchSimilarTracksForUser(String username, List<Long> selectedTrackIds) {
+    public List<TrackDto> fetchSimilarTracksForUser(String username, String spotifyId, List<Long> selectedTrackIds) {
+        var spotifyUserOpt = spotifyUserRepository.findBySpotifyId(spotifyId);
+        if (spotifyUserOpt.isEmpty()) {
+            throw new SecurityException("Spotify user not found or not logged in.");
+        }
+        var spotifyUser = spotifyUserOpt.get();
+
+        User user = userRepository.findByLastfmUsername(username)
+                .orElseThrow(() -> new NoSuchElementException("User not found: " + username));
+
+        boolean isLinked = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, user);
+        if (!isLinked) {
+            throw new SecurityException("This Spotify account is not linked with Last.fm user: " + username);
+        }
+
         List<Track> selectedTracks = trackRepository.findAllWithTagsByIdIn(selectedTrackIds);
 
         Set<String> userPreferredTags = selectedTracks.stream()
@@ -266,9 +284,6 @@ public class LastFmService {
         List<ScoredTrack> filtered = topScored.stream()
                 .filter(scored -> scored.score() >= 6)
                 .toList();
-
-        User user = userRepository.findByLastfmUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
         for (ScoredTrack scored : filtered) {
             Track track = scored.track;

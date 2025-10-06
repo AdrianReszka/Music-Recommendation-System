@@ -7,6 +7,8 @@ import com.example.model.Track;
 import com.example.model.User;
 import com.example.repository.RecommendationRepository;
 import com.example.repository.UserRepository;
+import com.example.repository.SpotifyUserLinkRepository;
+import com.example.repository.SpotifyUserRepository;
 import com.example.repository.TrackRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,8 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
     private final TrackRepository trackRepository;
+    private final SpotifyUserRepository spotifyUserRepository;
+    private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
     public List<Recommendation> getAll() {
         return recommendationRepository.findAll();
@@ -52,9 +56,21 @@ public class RecommendationService {
         }
     }
 
-    public List<TrackDto> getRecommendationsForUser(String username) {
+    public List<TrackDto> getRecommendationsForUser(String username, String spotifyId) {
         User user = userRepository.findByLastfmUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        if (spotifyId == null || spotifyId.isEmpty()) {
+            throw new RuntimeException("Spotify ID is required");
+        }
+
+        var su = spotifyUserRepository.findBySpotifyId(spotifyId)
+                .orElseThrow(() -> new SecurityException("Spotify account not found"));
+        boolean isLinked = spotifyUserLinkRepository.existsBySpotifyUserAndUser(su, user);
+
+        if (!isLinked) {
+            throw new SecurityException("This Last.fm user is not linked with your Spotify account");
+        }
 
         List<Recommendation> recommendations = recommendationRepository.findByUser(user);
 

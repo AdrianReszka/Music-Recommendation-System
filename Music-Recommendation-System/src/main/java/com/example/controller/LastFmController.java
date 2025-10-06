@@ -27,9 +27,10 @@ public class LastFmController {
     @PostMapping("/similar")
     public ResponseEntity<List<TrackDto>> getSimilarTracks(
             @RequestParam String username,
+            @RequestParam String spotifyId,
             @RequestBody List<Long> selectedTrackIds
     ) {
-        List<TrackDto> result = lastFmService.fetchSimilarTracksForUser(username, selectedTrackIds);
+        List<TrackDto> result = lastFmService.fetchSimilarTracksForUser(username, spotifyId, selectedTrackIds);
         return ResponseEntity.ok(result);
     }
 

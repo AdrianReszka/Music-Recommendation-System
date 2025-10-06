@@ -24,7 +24,7 @@ public class UserTrackController {
     @GetMapping("/import")
     public ResponseEntity<String> importLovedTracks(@RequestParam String username, @RequestParam String spotifyId) {
         try {
-            List<TrackDto> tracks = userTrackService.importLovedTracksFromLastFm(username,  spotifyId);
+            List<TrackDto> tracks = userTrackService.importLovedTracksFromLastFm(username, spotifyId);
 
             if (tracks.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)
@@ -51,9 +51,9 @@ public class UserTrackController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<?> getUserTracks(@PathVariable String username) {
+    public ResponseEntity<?> getUserTracks(@PathVariable String username, @RequestParam String spotifyId) {
         try {
-            List<TrackDto> tracks = userTrackService.getTracksForUser(username);
+            List<TrackDto> tracks = userTrackService.getTracksForUser(username, spotifyId);
 
             if (tracks.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT)

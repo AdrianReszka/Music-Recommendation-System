@@ -10,6 +10,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SpotifyUser {
 
     @Id
@@ -30,7 +33,8 @@ public class SpotifyUser {
     private LocalDateTime tokenExpiresAt;
 
     @OneToMany(mappedBy = "spotifyUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<User> users = new HashSet<>();
+    private Set<SpotifyUserLink> links = new HashSet<>();
 }
+
 
 
