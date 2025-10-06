@@ -176,9 +176,4 @@ public class SpotifyService {
 
         restTemplate.postForEntity(addTracksUrl, new HttpEntity<>(tracksBody, headers), Void.class);
     }
-
-    public void logout(String spotifyId) {
-        spotifyUserRepository.findBySpotifyId(spotifyId)
-                .ifPresent(spotifyUserRepository::delete);
-    }
 }

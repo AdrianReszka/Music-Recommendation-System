@@ -59,10 +59,4 @@ public class SpotifyController {
             return ResponseEntity.status(500).body("Error creating playlist");
         }
     }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestParam String spotifyId) {
-        spotifyService.logout(spotifyId);
-        return ResponseEntity.ok().build();
-    }
 }
