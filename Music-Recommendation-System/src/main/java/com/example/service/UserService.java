@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,11 +16,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
-    public List<User> getUsersLinkedToSpotify(String spotifyId) {
+    public List<String> getUsersLinkedToSpotify(String spotifyId) {
         List<SpotifyUserLink> links = spotifyUserLinkRepository.findBySpotifyUser_SpotifyId(spotifyId);
         return links.stream()
-                .map(SpotifyUserLink::getUser)
-                .collect(Collectors.toList());
+                .map(link -> link.getUser().getLastfmUsername())
+                .toList();
     }
 
     public List<User> getAll() {
