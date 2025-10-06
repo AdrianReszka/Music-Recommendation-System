@@ -7,7 +7,9 @@ import com.example.repository.SpotifyUserLinkRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,13 +19,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
-    public List<User> getUsersLinkedToSpotify(String spotifyId) {
-        List<SpotifyUserLink> links = spotifyUserLinkRepository
-                .findBySpotifyUser_SpotifyId(spotifyId);
+    public List<Map<String, String>> getUsersLinkedToSpotify(String spotifyId) {
+        List<SpotifyUserLink> links = spotifyUserLinkRepository.findBySpotifyUser_SpotifyId(spotifyId);
 
         return links.stream()
-                .map(SpotifyUserLink::getUser)
-                .filter(u -> u.getLastfmUsername() != null && !u.getLastfmUsername().isEmpty())
+                .map(link -> {
+                    User user = link.getUser();
+                    Map<String, String> dto = new HashMap<>();
+                    dto.put("lastfmUsername", user.getLastfmUsername());
+                    return dto;
+                })
+                .filter(dto -> dto.get("lastfmUsername") != null && !dto.get("lastfmUsername").isEmpty())
                 .collect(Collectors.toList());
     }
 
