@@ -156,9 +156,9 @@ export default function PlaylistsPanel() {
                     <div className="w-full flex flex-col sm:flex-row gap-4">
                         <div className="flex-1">
                             <DropdownSelect
-                                options={usernames.map(u => `Recommended tracks for ${u}`)}
+                                options={lists.map(l => l.label)}
                                 placeholder="Choose a list"
-                                value={selectedList}
+                                value={selectedList?.label || ""}
                                 onChange={handleListChange}
                             />
                         </div>
