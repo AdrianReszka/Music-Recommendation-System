@@ -51,9 +51,9 @@ public class RecommendationController {
     }
 
     @GetMapping("/user/{username}")
-    public List<TrackDto> getRecommendationsForUser(@PathVariable String username, @RequestParam String spotifyId) {
-        return recommendationService.getRecommendationsForUser(username, spotifyId);
+    public List<TrackDto> getRecommendationsForUser(@PathVariable String username, @RequestParam(required = false) String spotifyId,
+                                                    @RequestParam(required = false) String batchId) {
+        return recommendationService.getRecommendationsForUser(username, spotifyId, batchId);
     }
-
 }
 

@@ -3,8 +3,8 @@ import DropdownSelect from "../components/DropdownSelect.jsx";
 import PanelButton from "../components/PanelButton.jsx";
 
 export default function PlaylistsPanel() {
-    const [usernames, setUsernames] = useState([]);
-    const [selectedList, setSelectedList] = useState("");
+    const [lists, setLists] = useState([]); // <-- zamiast options + batchMap
+    const [selectedList, setSelectedList] = useState(null);
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [tracks, setTracks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -13,45 +13,65 @@ export default function PlaylistsPanel() {
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
     useEffect(() => {
+        const fetchRecommendationLists = async () => {
+            const spotifyId = sessionStorage.getItem("spotify_id");
+            if (!spotifyId) {
+                console.warn("No Spotify user logged in — skipping fetch.");
+                return;
+            }
 
-        const fetchLinkedUsers = async () => {
             try {
-                const spotifyId = sessionStorage.getItem("spotify_id");
-                if (!spotifyId) {
-                    console.warn("No Spotify user logged in — skipping fetch.");
-                    setUsernames([]);
+                const usersRes = await fetch(`/musicapp/users?spotifyId=${spotifyId}`);
+                if (!usersRes.ok) {
+                    console.error("Failed to fetch linked users, status:", usersRes.status);
                     return;
                 }
 
-                const res = await fetch(`/musicapp/users?spotifyId=${spotifyId}`);
-                console.log("Fetching users for spotifyId:", spotifyId);
-                if (res.ok) {
-                    const data = await res.json();
-                    console.log("Linked users (raw):", data);
-                    setUsernames(data.map(u => u.lastfmUsername));
-                } else {
-                    console.error("Failed to fetch linked users, status:", res.status);
-                    setUsernames([]);
+                const users = await usersRes.json();
+                const allLists = [];
+
+                for (const u of users) {
+                    const username = u.lastfmUsername;
+                    const res = await fetch(`/musicapp/recommendations/user/${username}/lists?spotifyId=${spotifyId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        data.forEach(batch => {
+                            allLists.push({
+                                label: `Recommended tracks for ${username} (${batch.createdAt})`,
+                                username,
+                                batchId: batch.batchId
+                            });
+                        });
+                    }
                 }
+
+                setLists(allLists);
             } catch (err) {
-                console.error("Error fetching linked users:", err);
-                setUsernames([]);
+                console.error("Error fetching recommendation lists:", err);
+                setLists([]);
             }
         };
 
-        fetchLinkedUsers();
+        fetchRecommendationLists();
     }, []);
 
-    const handleListChange = async (listName) => {
-        setSelectedList(listName);
+    const handleListChange = async (label) => {
+        const selected = lists.find(l => l.label === label);
+        setSelectedList(selected);
         setSelectedTracks([]);
         setSaved(false);
 
+        if (!selected) {
+            console.warn("Invalid list selected.");
+            return;
+        }
+
         const spotifyId = sessionStorage.getItem("spotify_id");
-        const username = listName.replace("Recommended tracks for ", "");
 
         try {
-            const res = await fetch(`/musicapp/recommendations/user/${username}?spotifyId=${spotifyId}`);
+            const res = await fetch(
+                `/musicapp/recommendations/user/${selected.username}?spotifyId=${spotifyId}&batchId=${selected.batchId}`
+            );
             if (res.ok) {
                 const data = await res.json();
                 setTracks(data);
@@ -98,8 +118,6 @@ export default function PlaylistsPanel() {
             return;
         }
 
-        setTracks([]);
-        setSelectedTracks([]);
         setIsLoading(true);
         setSaved(false);
 

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "recommendations")
 @Getter
@@ -22,7 +24,11 @@ public class Recommendation {
     @ManyToOne
     private Track track;
 
-    private double score;
+    @Column(name = "batch_id", nullable = false)
+    private String batchId;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
 }
 

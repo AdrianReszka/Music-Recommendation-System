@@ -55,7 +55,7 @@ public class RecommendationService {
         }
     }
 
-    public List<TrackDto> getRecommendationsForUser(String username, String spotifyId) {
+    public List<TrackDto> getRecommendationsForUser(String username, String spotifyId, String batchId) {
         User user = userRepository.findByLastfmUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
@@ -71,7 +71,12 @@ public class RecommendationService {
             throw new SecurityException("This Last.fm user is not linked with your Spotify account");
         }
 
-        List<Recommendation> recommendations = recommendationRepository.findByUser(user);
+        List<Recommendation> recommendations;
+        if (batchId != null && !batchId.isEmpty()) {
+            recommendations = recommendationRepository.findByUserAndBatchId(user, batchId);
+        } else {
+            recommendations = recommendationRepository.findByUser(user);
+        }
 
         return recommendations.stream()
                 .map(rec -> {

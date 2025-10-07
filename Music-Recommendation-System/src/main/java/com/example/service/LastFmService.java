@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -285,6 +286,9 @@ public class LastFmService {
                 .filter(scored -> scored.score() >= 6)
                 .toList();
 
+        String batchId = UUID.randomUUID().toString();
+        LocalDateTime now = LocalDateTime.now();
+
         for (ScoredTrack scored : filtered) {
             Track track = scored.track;
 
@@ -293,6 +297,8 @@ public class LastFmService {
                 Recommendation rec = new Recommendation();
                 rec.setUser(user);
                 rec.setTrack(track);
+                rec.setBatchId(batchId);
+                rec.setCreatedAt(now);
                 recommendationRepository.save(rec);
             }
         }
