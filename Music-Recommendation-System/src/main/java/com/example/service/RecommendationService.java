@@ -81,7 +81,6 @@ public class RecommendationService {
                     .toList();
         }
 
-        // 🔹 Jeśli batchId podany → zwróć konkretne tracki
         List<Recommendation> recommendations = recommendationRepository.findByUserAndBatchId(user, batchId);
 
         return recommendations.stream()
