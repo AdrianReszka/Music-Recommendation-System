@@ -15,11 +15,9 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     List<String> findDistinctUsernames();
 
     @Query("SELECT DISTINCT r.batchId, r.createdAt FROM Recommendation r WHERE r.user.id = :userId ORDER BY r.createdAt DESC")
-    List<Object[]> findDistinctBatchesByUser(@Param("userId") Long userId);
+    List<Object[]> findDistinctBatchIdsByUser(@Param("userId") Long userId);
 
     List<Recommendation> findByUserAndBatchId(User user, String batchId);
-
-    List<Recommendation> findByUser(User user);
 
     boolean existsByUserAndTrack(User user, Track track);
 

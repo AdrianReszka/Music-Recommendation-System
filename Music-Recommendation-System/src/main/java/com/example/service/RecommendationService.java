@@ -55,7 +55,7 @@ public class RecommendationService {
         }
     }
 
-    public List<TrackDto> getRecommendationsForUser(String username, String spotifyId, String batchId) {
+    public Object getRecommendationsForUser(String username, String spotifyId, String batchId) {
         User user = userRepository.findByLastfmUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
@@ -71,12 +71,18 @@ public class RecommendationService {
             throw new SecurityException("This Last.fm user is not linked with your Spotify account");
         }
 
-        List<Recommendation> recommendations;
-        if (batchId != null && !batchId.isEmpty()) {
-            recommendations = recommendationRepository.findByUserAndBatchId(user, batchId);
-        } else {
-            recommendations = recommendationRepository.findByUser(user);
+        if (batchId == null || batchId.isEmpty()) {
+            return recommendationRepository.findDistinctBatchIdsByUser(user.getId())
+                    .stream()
+                    .map(obj -> Map.of(
+                            "batchId", obj[0],
+                            "createdAt", obj[1] != null ? obj[1].toString() : "unknown"
+                    ))
+                    .toList();
         }
+
+        // 🔹 Jeśli batchId podany → zwróć konkretne tracki
+        List<Recommendation> recommendations = recommendationRepository.findByUserAndBatchId(user, batchId);
 
         return recommendations.stream()
                 .map(rec -> {

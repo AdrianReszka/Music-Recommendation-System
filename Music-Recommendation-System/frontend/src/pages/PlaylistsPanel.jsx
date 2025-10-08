@@ -3,7 +3,7 @@ import DropdownSelect from "../components/DropdownSelect.jsx";
 import PanelButton from "../components/PanelButton.jsx";
 
 export default function PlaylistsPanel() {
-    const [lists, setLists] = useState([]); // <-- zamiast options + batchMap
+    const [lists, setLists] = useState([]);
     const [selectedList, setSelectedList] = useState(null);
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [tracks, setTracks] = useState([]);
@@ -13,7 +13,7 @@ export default function PlaylistsPanel() {
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
     useEffect(() => {
-        const fetchRecommendationLists = async () => {
+        const fetchAllRecommendationLists = async () => {
             const spotifyId = sessionStorage.getItem("spotify_id");
             if (!spotifyId) {
                 console.warn("No Spotify user logged in — skipping fetch.");
@@ -32,19 +32,20 @@ export default function PlaylistsPanel() {
 
                 for (const u of users) {
                     const username = u.lastfmUsername;
-                    const res = await fetch(`/musicapp/recommendations/user/${username}/lists?spotifyId=${spotifyId}`);
+                    const res = await fetch(`/musicapp/recommendations/user/${username}?spotifyId=${spotifyId}`);
                     if (res.ok) {
-                        const data = await res.json();
-                        data.forEach(batch => {
+                        const batches = await res.json();
+                        batches.forEach(b =>
                             allLists.push({
-                                label: `Recommended tracks for ${username} (${batch.createdAt})`,
+                                label: `Recommended tracks for ${username} (${b.createdAt})`,
                                 username,
-                                batchId: batch.batchId
-                            });
-                        });
+                                batchId: b.batchId
+                            })
+                        );
                     }
                 }
 
+                allLists.sort((a, b) => b.label.localeCompare(a.label));
                 setLists(allLists);
             } catch (err) {
                 console.error("Error fetching recommendation lists:", err);
@@ -52,21 +53,21 @@ export default function PlaylistsPanel() {
             }
         };
 
-        fetchRecommendationLists();
+        fetchAllRecommendationLists();
     }, []);
 
     const handleListChange = async (label) => {
         const selected = lists.find(l => l.label === label);
-        setSelectedList(selected);
-        setSelectedTracks([]);
-        setSaved(false);
-
-        if (!selected) {
-            console.warn("Invalid list selected.");
-            return;
-        }
+        if (!selected) return;
 
         const spotifyId = sessionStorage.getItem("spotify_id");
+        if (!spotifyId) return;
+
+        setSelectedList(selected);
+        setTracks([]);
+        setSelectedTracks([]);
+        setSaved(false);
+        setIsLoading(true);
 
         try {
             const res = await fetch(
@@ -77,12 +78,12 @@ export default function PlaylistsPanel() {
                 setTracks(data);
             } else {
                 const text = await res.text();
-                console.error("Failed to fetch recommendations:", text);
-                setTracks([]);
+                console.error("Failed to fetch tracks:", text);
             }
         } catch (err) {
-            console.error("Error fetching tracks", err);
-            setTracks([]);
+            console.error("Error fetching tracks:", err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -108,10 +109,7 @@ export default function PlaylistsPanel() {
 
         const selectedDtos = tracks
             .filter(track => selectedTracks.includes(track.id))
-            .map(track => ({
-                title: track.title,
-                artist: track.artist
-            }));
+            .map(track => ({ title: track.title, artist: track.artist }));
 
         if (selectedDtos.length === 0) {
             alert("Please select at least one track");
@@ -170,7 +168,7 @@ export default function PlaylistsPanel() {
                     </div>
 
                     {isLoading ? (
-                        <p className="text-gray-300 text-xl">Saving playlist...</p>
+                        <p className="text-gray-300 text-xl">Loading...</p>
                     ) : saved ? (
                         <p className="text-gray-300 text-xl">
                             Saved as: <span className="font-bold text-white">"{fixedPlaylistName}"</span>
