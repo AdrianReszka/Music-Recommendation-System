@@ -168,7 +168,7 @@ export default function PlaylistsPanel() {
                     </div>
 
                     {isLoading ? (
-                        <p className="text-gray-300 text-xl">Loading...</p>
+                        <p className="text-gray-300 text-xl">Saving playlist...</p>
                     ) : saved ? (
                         <p className="text-gray-300 text-xl">
                             Saved as: <span className="font-bold text-white">"{fixedPlaylistName}"</span>

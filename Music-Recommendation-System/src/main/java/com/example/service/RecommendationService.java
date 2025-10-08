@@ -14,6 +14,8 @@ import com.example.repository.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -72,12 +74,21 @@ public class RecommendationService {
         }
 
         if (batchId == null || batchId.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
             return recommendationRepository.findDistinctBatchIdsByUser(user.getId())
                     .stream()
-                    .map(obj -> Map.of(
-                            "batchId", obj[0],
-                            "createdAt", obj[1] != null ? obj[1].toString() : "unknown"
-                    ))
+                    .map(obj -> {
+                        String batchIdStr = (String) obj[0];
+                        LocalDateTime createdAt = (LocalDateTime) obj[1];
+
+                        String formattedDate = createdAt != null ? createdAt.format(formatter) : "unknown";
+
+                        return Map.of(
+                                "batchId", batchIdStr,
+                                "createdAt", formattedDate
+                        );
+                    })
                     .toList();
         }
 
