@@ -13,8 +13,14 @@ export default function LandingPage() {
     };
 
     return (
-        <main className="w-screen h-screen flex flex-col justify-center items-center bg-[#1f1f1f] text-white text-center px-4">
-
+        <main className="w-screen h-screen flex flex-col justify-center items-center bg-[#1f1f1f] text-white text-center px-4"
+              style={{
+                  backgroundImage: 'url(/images/background.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundAttachment: 'fixed'
+              }}
+        >
             <h1 className="text-7xl sm:text-8xl font-extrabold mb-10">
                 Beat Bridge
             </h1>
@@ -27,11 +33,11 @@ export default function LandingPage() {
                 Login to Spotify
             </LoginWithSpotifyButton>
 
-            <p className="mt-10 text-base sm:text-lg text-gray-500">
+            <p className="mt-10 text-base sm:text-lg text-gray-400">
                 We only ask for the scopes needed to create your playlist.
             </p>
 
-            <p className="mt-12 text-sm text-gray-600">
+            <p className="mt-12 text-sm text-gray-500">
                 © {new Date().getFullYear()} BeatBridge
             </p>
         </main>
