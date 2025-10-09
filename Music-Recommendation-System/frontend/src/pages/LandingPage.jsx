@@ -38,7 +38,7 @@ export default function LandingPage() {
             </p>
 
             <p className="mt-12 text-sm text-gray-500">
-                © {new Date().getFullYear()} BeatBridge
+                BeatBridge {new Date().getFullYear()}
             </p>
         </main>
     );

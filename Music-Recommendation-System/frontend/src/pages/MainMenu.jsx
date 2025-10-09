@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar.jsx';
-import Sidebar from '../components/Sidebar.jsx';
 import LovedTracksPanel from "./LovedTracksPanel.jsx";
 import RecommendationsPanel from "./RecommendationsPanel.jsx";
 import PlaylistsPanel from "./PlaylistsPanel.jsx";
@@ -22,19 +21,23 @@ function MainMenu() {
     }, [navigate]);
 
     return (
-        <>
-            <TopBar username={username} />
+        <div
+            className="w-screen h-screen flex flex-col overflow-hidden"
+            style={{
+                backgroundImage: 'url(/images/background.jpg)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundAttachment: 'fixed'
+            }}
+        >
+            <TopBar username={username} setActiveView={setActiveView} />
 
-            <div className="w-screen mt-[10vh] h-[90vh] flex flex-row overflow-hidden shadow-md">
-                <Sidebar setActiveView={setActiveView} />
-
-                <div className="flex-1 bg-[#1f1f1f] text-white p-8 overflow-y-auto h-full shadow-md">
-                    {activeView === 'loved' && <LovedTracksPanel />}
-                    {activeView === 'recommend' && <RecommendationsPanel />}
-                    {activeView === 'playlist' && <PlaylistsPanel />}
-                </div>
+            <div className="flex-1 text-white p-8 overflow-y-auto bg-black/40 backdrop-blur-md m-0 rounded-lg">
+                {activeView === 'loved' && <LovedTracksPanel />}
+                {activeView === 'recommend' && <RecommendationsPanel />}
+                {activeView === 'playlist' && <PlaylistsPanel />}
             </div>
-        </>
+        </div>
     );
 }
 

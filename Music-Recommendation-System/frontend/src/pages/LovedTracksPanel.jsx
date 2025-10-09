@@ -50,40 +50,87 @@ export default function LovedTracksPanel() {
     };
 
     return (
-        <div className="w-full h-full flex items-center justify-center px-4">
-            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md p-6
-                sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
+        <div className="w-full min-h-[100vh] text-white flex items-center justify-center px-4">
+            <div className="grid md:grid-cols-2 items-center justify-center w-full max-w-[calc(100%-2*12.5vw)] gap-12">
 
-                <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
-                    Download Loved Tracks
-                </h2>
+                <section className="w-full max-w-[40rem] mx-auto text-center md:text-left">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
+                        Download Loved Tracks
+                    </h2>
+                    <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                        Download your favorite tracks from Last.fm and sync them with BeatBridge.
+                        Keep all your musical gems in one place.
+                    </p>
 
-                <div className="flex flex-col gap-4">
-                    <label className="text-gray-300 text-xl">Enter Last.fm username</label>
-                    <div className="w-full flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                            <UsernameInput
-                                value={username}
-                                onChange={e => setUsername(e.target.value)}
-                                placeholder={"User name"}
-                            />
-                        </div>
-                        <div className="w-full sm:w-auto">
-                            <PanelButton onClick={handleDownload}>
-                                Download loved tracks
-                            </PanelButton>
-                        </div>
+                    <label className="block mb-2 text-sm text-neutral-400">
+                        Enter Your Last.fm username
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <UsernameInput
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            placeholder="User name"
+                        />
+                        <PanelButton onClick={handleDownload}>
+                            Download loved tracks
+                        </PanelButton>
                     </div>
 
                     {isLoading ? (
-                        <p className="text-gray-300 text-xl">Fetching loved tracks...</p>
+                        <p className="text-gray-300 text-base mt-4">
+                            Fetching loved tracks...
+                        </p>
                     ) : savedAs ? (
-                        <p className="text-gray-300 text-xl">
-                            Saved as: <span className="font-bold text-white">"{savedAs}"</span>
+                        <p className="text-gray-300 text-base mt-4">
+                            Saved as:{" "}
+                            <span className="font-bold text-white">"{savedAs}"</span>
                         </p>
                     ) : null}
-                </div>
 
+                    <p className="mt-4 text-sm text-neutral-400">
+                        Don't have a Last.fm account?{" "}
+                        <a href="#" className="text-[#1DB954] hover:underline">
+                            Learn more
+                        </a>
+                    </p>
+                </section>
+
+                <section className="w-full max-w-[40rem] mx-auto flex flex-col items-center justify-center text-center space-y-6">
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-transparent rounded-full flex items-center justify-center border-2 border-[#1DB954]">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 24 24"
+                            className="w-20 h-20 sm:w-24 sm:h-24 text-[#1DB954]"
+                        >
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </div>
+
+                    <p className="text-neutral-300 text-base sm:text-lg">
+                        Already <span className="text-[#1DB954] font-semibold">12 431</span>{" "}
+                        tracks downloaded by users!
+                    </p>
+
+                    <div className="flex items-center gap-8">
+                        <div className="text-center">
+                            <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
+                                148
+                            </div>
+                            <div className="text-sm text-neutral-400">
+                                Average number of fetched loved tracks
+                            </div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
+                                3 min
+                            </div>
+                            <div className="text-sm text-neutral-400">
+                                Average download time
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     );
