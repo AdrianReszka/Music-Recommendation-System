@@ -39,7 +39,7 @@ export default function RecommendationsPanel() {
         fetchLinkedUsers();
     }, []);
 
-    const handleListChange = async (listName) => {
+    const handleListChange = (listName) => {
         const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) {
             console.warn("No Spotify user logged in");
@@ -50,8 +50,6 @@ export default function RecommendationsPanel() {
         setRecommendations([]);
         setSelectedTracks([]);
         setCreatedFrom("");
-
-        console.log("Selected list name:", listName);
 
         const username = listName
             .replace(" loved tracks", "")
@@ -67,27 +65,16 @@ export default function RecommendationsPanel() {
             return;
         }
 
-        try {
-            const res = await fetch(endpoint);
-            if (res.ok) {
-                const data = await res.json();
-                setRecommendations(data);
-            } else {
-                console.error("Failed to fetch tracks, status:", res.status);
+        fetch(endpoint)
+            .then((res) => {
+                if (!res.ok) throw new Error("Failed to fetch tracks");
+                return res.json();
+            })
+            .then((data) => setRecommendations(data))
+            .catch((err) => {
+                console.error("Failed to fetch tracks", err);
                 setRecommendations([]);
-            }
-        } catch (err) {
-            console.error("Failed to fetch tracks", err);
-            setRecommendations([]);
-        }
-    };
-
-    const toggleTrack = (trackId) => {
-        setSelectedTracks(prev =>
-            prev.includes(trackId)
-                ? prev.filter(id => id !== trackId)
-                : [...prev, trackId]
-        );
+            });
     };
 
     const handleGenerate = async () => {

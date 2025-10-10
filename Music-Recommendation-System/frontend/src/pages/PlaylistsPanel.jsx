@@ -120,6 +120,8 @@ export default function PlaylistsPanel() {
             return;
         }
 
+        setTracks([]);
+        setSelectedTracks([]);
         setIsLoading(true);
         setSaved(false);
 
@@ -132,12 +134,6 @@ export default function PlaylistsPanel() {
 
             if (res.ok) {
                 setSaved(true);
-
-                setTracks([]);
-                setSelectedTracks([]);
-                setIsLoading(true);
-                setSaved(false);
-
             } else {
                 const err = await res.text();
                 alert("Failed to create playlist: " + err);
