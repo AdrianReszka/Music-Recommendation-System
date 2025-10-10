@@ -69,7 +69,6 @@ export default function PlaylistsPanel() {
             setSelectedList(selected);
         }
 
-        setSelectedList(selected);
         setTracks([]);
         setSelectedTracks([]);
         setSaved(false);

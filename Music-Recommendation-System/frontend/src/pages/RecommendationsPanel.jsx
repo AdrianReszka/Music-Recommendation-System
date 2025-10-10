@@ -41,13 +41,7 @@ export default function RecommendationsPanel() {
 
     const handleListChange = async (listName) => {
         const spotifyId = sessionStorage.getItem("spotify_id");
-        if (selectedList === listName) {
-            setSelectedList('');
-            await new Promise(r => setTimeout(r, 0));
-            setSelectedList(listName);
-        } else {
-            setSelectedList(listName);
-        }
+        setSelectedList(listName);
 
         console.log("Selected list name:", listName);
 
@@ -81,6 +75,7 @@ export default function RecommendationsPanel() {
             setRecommendations([]);
         }
 
+        setRecommendations([]);
         setSelectedTracks([]);
         setCreatedFrom("");
     };
