@@ -61,6 +61,8 @@ export default function PlaylistsPanel() {
         const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) return;
 
+        setSaved(false);
+
         if (selectedList?.label === label) {
             setSelectedList(null);
             await new Promise(r => setTimeout(r, 0));

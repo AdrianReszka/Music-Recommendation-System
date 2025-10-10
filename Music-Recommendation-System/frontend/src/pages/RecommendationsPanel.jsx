@@ -46,10 +46,11 @@ export default function RecommendationsPanel() {
             return;
         }
 
+        setCreatedFrom("");
+
         setSelectedList(listName);
         setRecommendations([]);
         setSelectedTracks([]);
-        setCreatedFrom("");
 
         const username = listName
             .replace(" loved tracks", "")
@@ -75,6 +76,14 @@ export default function RecommendationsPanel() {
                 console.error("Failed to fetch tracks", err);
                 setRecommendations([]);
             });
+    };
+
+    const toggleTrack = (trackId) => {
+        setSelectedTracks(prev =>
+            prev.includes(trackId)
+                ? prev.filter(id => id !== trackId)
+                : [...prev, trackId]
+        );
     };
 
     const handleGenerate = async () => {
