@@ -147,18 +147,22 @@ export default function RecommendationsPanel() {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1">
                         <DropdownSelect
-                            options={[
-                                ...users.map(u => `${u} loved tracks`),
-                                ...users.map(u => `Recommended tracks for ${u}`)
-                            ]}
+                            options={users.map(u => `${u} loved tracks`)}
                             placeholder="Choose a list"
                             value={selectedList}
                             onChange={handleListChange}
                         />
                     </div>
-                    <PanelButton onClick={handleGenerate}>
+
+                    <PanelButton
+                        onClick={() => {
+                            document.activeElement.blur();
+                            handleGenerate();
+                        }}
+                    >
                         Generate recommendations
                     </PanelButton>
+
                 </div>
 
                 {isLoading ? (
@@ -169,19 +173,18 @@ export default function RecommendationsPanel() {
                     <p className="text-gray-300 text-base mt-4">
                         Saved as:{" "}
                         <span className="font-bold text-white">
-                            "Recommended tracks for {createdFrom}"
-                        </span>
+                        "Recommended tracks for {createdFrom}"
+                    </span>
                     </p>
                 ) : null}
 
                 {recommendations.length > 0 && (
-                    <div className="mt-6 flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
+                    <div className="mt-8 grid sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
                         {recommendations.map((track, idx) => (
                             <label
                                 key={idx}
-                                className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                                           bg-[#1a1a1a] border border-transparent hover:bg-[#333] hover:border-[#1DB954]
-                                           transition"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-[#181818] hover:bg-[#262626]
+                                       transition cursor-pointer shadow-md relative group"
                             >
                                 <input
                                     type="checkbox"
@@ -189,10 +192,49 @@ export default function RecommendationsPanel() {
                                     onChange={() => toggleTrack(track.id)}
                                     className="w-5 h-5 accent-[#1DB954]"
                                 />
-                                <div className="flex flex-col text-left">
-                                    <span className="text-white text-lg font-bold">{track.title}</span>
-                                    <span className="text-gray-400 text-sm">{track.artist}</span>
+
+                                <div className="flex flex-col overflow-hidden flex-grow">
+                                    <span className="text-white font-semibold truncate">{track.title}</span>
+                                    <span className="text-gray-400 text-sm truncate">{track.artist}</span>
                                 </div>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        console.log(`Play preview for ${track.title}`);
+                                    }}
+                                    className="text-[#1DB954] hover:text-white cursor-pointer transition transform hover:scale-110"
+                                    title="Play preview"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24"
+                                        className="w-6 h-6"
+                                    >
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        console.log(`Remove ${track.title}`);
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 cursor-pointer transition transform hover:scale-110 ml-1"
+                                    title="Remove track"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth="2"
+                                        stroke="currentColor"
+                                        className="w-5 h-5"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </label>
                         ))}
                     </div>

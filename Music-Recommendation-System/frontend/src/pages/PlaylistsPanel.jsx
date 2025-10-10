@@ -166,9 +166,16 @@ export default function PlaylistsPanel() {
                             onChange={handleListChange}
                         />
                     </div>
-                    <PanelButton onClick={handleSavePlaylist}>
+
+                    <PanelButton
+                        onClick={() => {
+                            document.activeElement.blur();
+                            handleSavePlaylist();
+                        }}
+                    >
                         Save playlist
                     </PanelButton>
+
                 </div>
 
                 {isLoading ? (
