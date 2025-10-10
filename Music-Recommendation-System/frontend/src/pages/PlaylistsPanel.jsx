@@ -9,7 +9,6 @@ export default function PlaylistsPanel() {
     const [tracks, setTracks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [saved, setSaved] = useState(false);
-    const [selectedLabel, setSelectedLabel] = useState("");
 
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
@@ -164,14 +163,12 @@ export default function PlaylistsPanel() {
                         <DropdownSelect
                             options={lists.map(l => l.label)}
                             placeholder="Choose a list"
-                            value={selectedLabel}
+                            value={selectedList?.label || ""}
                             onChange={handleListChange}
                         />
                     </div>
                     <PanelButton
-                        onMouseDown={() => {
-                            document.activeElement.blur();
-                        }}
+                        onMouseDown={() => document.activeElement.blur()}
                         onClick={handleSavePlaylist}
                     >
                         Save playlist
