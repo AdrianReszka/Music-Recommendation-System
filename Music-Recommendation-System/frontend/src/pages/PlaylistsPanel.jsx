@@ -64,7 +64,6 @@ export default function PlaylistsPanel() {
         if (!spotifyId) return;
 
         setSelectedList(selected);
-        setSelectedLabel(label);
         setTracks([]);
         setSelectedTracks([]);
         setSaved(false);
