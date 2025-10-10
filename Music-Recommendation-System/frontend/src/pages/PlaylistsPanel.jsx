@@ -58,10 +58,16 @@ export default function PlaylistsPanel() {
 
     const handleListChange = async (label) => {
         const selected = lists.find(l => l.label === label);
-        if (!selected) return;
-
         const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) return;
+
+        if (selectedList?.label === label) {
+            setSelectedList(null);
+            await new Promise(r => setTimeout(r, 0));
+            setSelectedList(selected);
+        } else {
+            setSelectedList(selected);
+        }
 
         setSelectedList(selected);
         setTracks([]);

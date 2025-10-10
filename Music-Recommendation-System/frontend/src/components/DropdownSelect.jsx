@@ -1,8 +1,20 @@
-import React, { useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function DropdownSelect({ options, placeholder, value, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const handleSelect = (option) => {
         onChange(option);
