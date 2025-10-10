@@ -71,8 +71,7 @@ export default function PlaylistsPanel() {
 
         setTracks([]);
         setSelectedTracks([]);
-        setSaved(false);
-        setIsLoading(true);
+        setSaved(true);
 
         try {
             const res = await fetch(
@@ -185,7 +184,7 @@ export default function PlaylistsPanel() {
                     </PanelButton>
                 </div>
 
-                {isLoading && saved ? (
+                {isLoading ? (
                     <p className="text-gray-300 text-base mt-4">
                         Saving playlist...
                     </p>

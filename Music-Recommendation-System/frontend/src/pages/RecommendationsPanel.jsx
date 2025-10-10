@@ -124,8 +124,6 @@ export default function RecommendationsPanel() {
             }
         } catch (err) {
             alert("Failed to generate recommendations");
-        } finally {
-            setIsLoading(false);
         }
     };
 
