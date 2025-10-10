@@ -41,7 +41,12 @@ export default function RecommendationsPanel() {
 
     const handleListChange = async (listName) => {
         const spotifyId = sessionStorage.getItem("spotify_id");
+
         setSelectedList(listName);
+        setRecommendations([]);
+        setSelectedTracks([]);
+        setCreatedFrom("");
+        setIsLoading(true);
 
         console.log("Selected list name:", listName);
 
@@ -74,10 +79,6 @@ export default function RecommendationsPanel() {
             console.error("Failed to fetch tracks", err);
             setRecommendations([]);
         }
-
-        setRecommendations([]);
-        setSelectedTracks([]);
-        setCreatedFrom("");
     };
 
     const toggleTrack = (trackId) => {
