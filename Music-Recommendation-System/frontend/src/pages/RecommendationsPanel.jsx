@@ -100,28 +100,19 @@ export default function RecommendationsPanel() {
         const spotifyId = sessionStorage.getItem("spotify_id");
         const username = selectedList.replace(" loved tracks", "");
 
-        // 🔹 Przygotowanie pełnych obiektów, nie tylko ID
-        const selectedDtos = recommendations
-            .filter(track => selectedTracks.includes(track.id))
-            .map(track => ({
-                id: track.id,
-                title: track.title,
-                artist: track.artist,
-                spotifyId: track.spotifyId || null,
-                lastfmId: track.lastfmId || null,
-            }));
-
         setRecommendations([]);
         setSelectedTracks([]);
         setCreatedFrom("");
         setIsLoading(true);
 
         try {
+            console.log("Selected track IDs:", selectedTracks);
             const res = await fetch(`/musicapp/lastfm/similar?username=${username}&spotifyId=${spotifyId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(selectedDtos)
+                body: JSON.stringify(selectedTracks)
             });
+
             if (res.ok) {
                 const data = await res.json();
                 setCreatedFrom(username);
