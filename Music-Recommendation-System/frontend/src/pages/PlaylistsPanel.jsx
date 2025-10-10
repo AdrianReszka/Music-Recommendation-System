@@ -141,65 +141,102 @@ export default function PlaylistsPanel() {
     };
 
     return (
-        <div className="w-full h-full flex items-center justify-center px-4">
-            <div className="w-full h-[100vh] max-w-[calc(100%-2*12.5vw)] bg-[#2a2a2a] shadow-md
-                            p-6 sm:p-10 md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
+        <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
 
-                <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
+            <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
+
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                     Save Playlist
                 </h2>
 
-                <div className="flex flex-col gap-4">
-                    <label className="text-gray-300 text-xl">Select recommendations list</label>
-                    <div className="w-full flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                            <DropdownSelect
-                                options={lists.map(l => l.label)}
-                                placeholder="Choose a list"
-                                value={selectedList?.label || ""}
-                                onChange={handleListChange}
-                            />
-                        </div>
-                        <div className="w-full sm:w-auto">
-                            <PanelButton onClick={handleSavePlaylist}>
-                                Save Playlist
-                            </PanelButton>
-                        </div>
-                    </div>
+                <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                    Choose one of your generated recommendation lists and save it as a playlist directly on Spotify.
+                </p>
 
-                    {isLoading ? (
-                        <p className="text-gray-300 text-xl">Saving playlist...</p>
-                    ) : saved ? (
-                        <p className="text-gray-300 text-xl">
-                            Saved as: <span className="font-bold text-white">"{fixedPlaylistName}"</span>
-                        </p>
-                    ) : null}
+                <label className="block mb-2 text-sm text-neutral-400">
+                    Select recommendations list
+                </label>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                        <DropdownSelect
+                            options={lists.map(l => l.label)}
+                            placeholder="Choose a list"
+                            value={selectedList?.label || ""}
+                            onChange={handleListChange}
+                        />
+                    </div>
+                    <PanelButton onClick={handleSavePlaylist}>
+                        Save playlist
+                    </PanelButton>
                 </div>
 
+                {isLoading ? (
+                    <p className="text-gray-300 text-base mt-4">
+                        {saved ? "Saving playlist..." : "Loading tracks..."}
+                    </p>
+                ) : saved ? (
+                    <p className="text-gray-300 text-base mt-4">
+                        Saved as:{" "}
+                        <span className="font-bold text-white">
+                        "{fixedPlaylistName}"
+                    </span>
+                    </p>
+                ) : null}
+
                 {tracks.length > 0 && (
-                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
+                    <div className="mt-8 grid sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
                         {tracks.map((track, idx) => (
                             <label
                                 key={idx}
-                                className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                                           bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
-                                           transition focus:outline-none"
+                                className="flex items-center gap-3 p-3 rounded-xl bg-[#181818] hover:bg-[#262626]
+                                       transition cursor-pointer shadow-md relative group"
                             >
                                 <input
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-white"
+                                    className="w-5 h-5 accent-[#1DB954]"
                                 />
-                                <div className="flex flex-col">
-                                    <span className="text-white text-lg font-bold">{track.title}</span>
-                                    <span className="text-gray-400 text-sm">{track.artist}</span>
+
+                                <div className="flex flex-col overflow-hidden flex-grow">
+                                    <span className="text-white font-semibold truncate">{track.title}</span>
+                                    <span className="text-gray-400 text-sm truncate">{track.artist}</span>
                                 </div>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        console.log(`Play preview for ${track.title}`);
+                                    }}
+                                    className="text-[#1DB954] hover:text-white cursor-pointer transition text-lg"
+                                    title="Play preview"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 24 24"
+                                        className="w-6 h-6"
+                                    >
+                                        <path d="M8 5v14l11-7z" />
+                                    </svg>
+                                </button>
+
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        console.log(`Remove ${track.title} from list`);
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 cursor-pointer transition text-lg font-bold ml-2"
+                                    title="Remove track"
+                                >
+                                    ✕
+                                </button>
                             </label>
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 }

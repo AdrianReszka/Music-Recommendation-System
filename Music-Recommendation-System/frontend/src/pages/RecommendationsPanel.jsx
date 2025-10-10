@@ -128,57 +128,68 @@ export default function RecommendationsPanel() {
     };
 
     return (
-        <div className="w-full h-full flex items-center justify-center px-4">
-            <div className="w-full h-[70%] max-w-[64rem] bg-[#2a2a2a] border border-gray-500 rounded-xl shadow-md p-6 sm:p-10
-                md:p-14 lg:p-16 flex flex-col justify-evenly gap-6">
+        <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
 
-                <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-center leading-snug">
+            <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
+
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                     Generate Recommendations
                 </h2>
 
-                <div className="flex flex-col gap-4">
-                    <label className="text-gray-300 text-xl">Select loved tracks list</label>
-                    <div className="w-full flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1">
-                            <DropdownSelect
-                                options={users.map(u => `${u} loved tracks`)}
-                                placeholder="Choose a list"
-                                value={selectedList}
-                                onChange={handleListChange}
-                            />
-                        </div>
-                        <div className="w-full sm:w-auto">
-                            <PanelButton onClick={handleGenerate}>
-                                Generate recommendations
-                            </PanelButton>
-                        </div>
-                    </div>
+                <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                    Choose a list of loved tracks and generate new song suggestions based on them.
+                </p>
 
-                    {isLoading ? (
-                        <p className="text-gray-300 text-xl">Generating recommendations...</p>
-                    ) : createdFrom ? (
-                        <p className="text-gray-300 text-xl">
-                            Saved as: <span className="font-bold text-white">"Recommended tracks for {createdFrom}"</span>
-                        </p>
-                    ) : null}
+                <label className="block mb-2 text-sm text-neutral-400">
+                    Select loved tracks list
+                </label>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="flex-1">
+                        <DropdownSelect
+                            options={[
+                                ...users.map(u => `${u} loved tracks`),
+                                ...users.map(u => `Recommended tracks for ${u}`)
+                            ]}
+                            placeholder="Choose a list"
+                            value={selectedList}
+                            onChange={handleListChange}
+                        />
+                    </div>
+                    <PanelButton onClick={handleGenerate}>
+                        Generate recommendations
+                    </PanelButton>
                 </div>
 
+                {isLoading ? (
+                    <p className="text-gray-300 text-base mt-4">
+                        Generating recommendations...
+                    </p>
+                ) : createdFrom ? (
+                    <p className="text-gray-300 text-base mt-4">
+                        Saved as:{" "}
+                        <span className="font-bold text-white">
+                            "Recommended tracks for {createdFrom}"
+                        </span>
+                    </p>
+                ) : null}
+
                 {recommendations.length > 0 && (
-                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
+                    <div className="mt-6 flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 hide-scrollbar">
                         {recommendations.map((track, idx) => (
                             <label
                                 key={idx}
                                 className="flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer shadow-md
-                                           bg-[#1a1a1a] border border-transparent hover:bg-[#444] hover:border-white
-                                           transition focus:outline-none"
+                                           bg-[#1a1a1a] border border-transparent hover:bg-[#333] hover:border-[#1DB954]
+                                           transition"
                             >
                                 <input
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-white"
+                                    className="w-5 h-5 accent-[#1DB954]"
                                 />
-                                <div className="flex flex-col">
+                                <div className="flex flex-col text-left">
                                     <span className="text-white text-lg font-bold">{track.title}</span>
                                     <span className="text-gray-400 text-sm">{track.artist}</span>
                                 </div>
@@ -186,7 +197,7 @@ export default function RecommendationsPanel() {
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 }

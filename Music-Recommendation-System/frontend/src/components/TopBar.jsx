@@ -34,7 +34,6 @@ function TopBar({ username, setActiveView }) {
                 </button>
             </div>
 
-            {/* Desktop menu */}
             <div className="hidden sm:flex space-x-10 sm:space-x-8 flex-wrap justify-center">
                 <button
                     onClick={() => handleViewChange('loved')}
@@ -65,22 +64,22 @@ function TopBar({ username, setActiveView }) {
             >
                 <button
                     onClick={() => handleViewChange('loved')}
-                    className="text-[#191414] hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
+                    className="text-[#191414] cursor-pointer hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
                     Loved Tracks
                 </button>
                 <button
                     onClick={() => handleViewChange('recommend')}
-                    className="text-[#191414] hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
+                    className="text-[#191414] cursor-pointer hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
                     Recommendations
                 </button>
                 <button
                     onClick={() => handleViewChange('playlist')}
-                    className="text-[#191414] hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
+                    className="text-[#191414] cursor-pointer hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
                     Playlists
                 </button>
                 <button
                     onClick={handleLogout}
-                    className="text-[#191414] hover:text-red-500 text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
+                    className="text-[#191414] cursor-pointer hover:text-red-500 text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
                     Logout
                 </button>
             </div>

@@ -53,7 +53,7 @@ export default function LovedTracksPanel() {
         <div className="w-full min-h-[100vh] text-white flex items-center justify-center px-4">
             <div className="grid md:grid-cols-2 items-center justify-center w-full max-w-[calc(100%-2*12.5vw)] gap-12">
 
-                <section className="w-full max-w-[40rem] mx-auto text-center md:text-left">
+                <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                         Download Loved Tracks
                     </h2>
@@ -95,7 +95,7 @@ export default function LovedTracksPanel() {
                     </p>
                 </section>
 
-                <section className="w-full max-w-[40rem] mx-auto flex flex-col items-center justify-center text-center space-y-6">
+                <section className="w-full max-w-[44rem] mx-auto flex flex-col items-center justify-center text-center space-y-6">
                     <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 bg-transparent rounded-full flex items-center justify-center border-2 border-[#1DB954]">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
