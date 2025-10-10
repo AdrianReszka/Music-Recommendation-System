@@ -133,6 +133,12 @@ export default function PlaylistsPanel() {
 
             if (res.ok) {
                 setSaved(true);
+
+                setTracks([]);
+                setSelectedTracks([]);
+                setIsLoading(true);
+                setSaved(false);
+
             } else {
                 const err = await res.text();
                 alert("Failed to create playlist: " + err);
@@ -179,16 +185,16 @@ export default function PlaylistsPanel() {
                     </PanelButton>
                 </div>
 
-                {isLoading ? (
+                {isLoading && saved ? (
                     <p className="text-gray-300 text-base mt-4">
-                        {saved ? "Saving playlist..." : "Loading tracks..."}
+                        Saving playlist...
                     </p>
                 ) : saved ? (
                     <p className="text-gray-300 text-base mt-4">
                         Saved as:{" "}
                         <span className="font-bold text-white">
-                        "{fixedPlaylistName}"
-                    </span>
+                            "{fixedPlaylistName}"
+                        </span>
                     </p>
                 ) : null}
 

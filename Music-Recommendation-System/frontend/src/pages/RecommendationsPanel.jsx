@@ -41,20 +41,21 @@ export default function RecommendationsPanel() {
 
     const handleListChange = async (listName) => {
         const spotifyId = sessionStorage.getItem("spotify_id");
+        if (!spotifyId) {
+            console.warn("No Spotify user logged in");
+            return;
+        }
 
         setSelectedList(listName);
         setRecommendations([]);
         setSelectedTracks([]);
         setCreatedFrom("");
-        setIsLoading(true);
 
         console.log("Selected list name:", listName);
 
         const username = listName
             .replace(" loved tracks", "")
             .replace("Recommended tracks for ", "");
-
-        console.log("Extracted username:", username);
 
         let endpoint = "";
         if (listName.includes("loved tracks")) {
@@ -108,7 +109,6 @@ export default function RecommendationsPanel() {
         setIsLoading(true);
 
         try {
-            console.log("Selected track IDs:", selectedTracks);
             const res = await fetch(`/musicapp/lastfm/similar?username=${username}&spotifyId=${spotifyId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -116,15 +116,13 @@ export default function RecommendationsPanel() {
             });
 
             if (res.ok) {
-                const data = await res.json();
+                await res.json();
                 setCreatedFrom(username);
             } else {
                 const err = await res.text();
-                console.error("Failed to generate recommendations:", err);
                 alert("Backend error: " + err);
             }
         } catch (err) {
-            console.error("Error generating recommendations", err);
             alert("Failed to generate recommendations");
         } finally {
             setIsLoading(false);
