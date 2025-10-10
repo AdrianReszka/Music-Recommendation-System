@@ -71,7 +71,6 @@ export default function PlaylistsPanel() {
 
         setTracks([]);
         setSelectedTracks([]);
-        setSaved(true);
 
         try {
             const res = await fetch(
