@@ -157,10 +157,8 @@ export default function RecommendationsPanel() {
                     </div>
 
                     <PanelButton
-                        onClick={() => {
-                            document.activeElement.blur();
-                            handleGenerate();
-                        }}
+                        onMouseDown={() => document.activeElement.blur()}
+                        onClick={handleGenerate}
                     >
                         Generate recommendations
                     </PanelButton>

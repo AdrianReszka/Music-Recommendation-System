@@ -167,10 +167,10 @@ export default function PlaylistsPanel() {
                         />
                     </div>
                     <PanelButton
-                        onClick={() => {
+                        onMouseDown={() => {
                             document.activeElement.blur();
-                            handleSavePlaylist();
                         }}
+                        onClick={handleSavePlaylist}
                     >
                         Save playlist
                     </PanelButton>
