@@ -6,6 +6,7 @@ import com.example.model.SpotifyUserLink;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface SpotifyUserLinkRepository extends JpaRepository<SpotifyUserLink, Long> {
@@ -13,5 +14,7 @@ public interface SpotifyUserLinkRepository extends JpaRepository<SpotifyUserLink
     boolean existsBySpotifyUserAndUser(SpotifyUser spotifyUser, User user);
 
     List<SpotifyUserLink> findBySpotifyUser_SpotifyId(String spotifyId);
+
+    Optional<SpotifyUserLink> findBySpotifyUserAndUser(SpotifyUser spotifyUser, User user);
 
 }

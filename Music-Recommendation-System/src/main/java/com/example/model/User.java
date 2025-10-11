@@ -27,7 +27,7 @@ public class User {
     @Column(length = 4000)
     private String spotifyToken;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private Set<SpotifyUserLink> links = new HashSet<>();
 }

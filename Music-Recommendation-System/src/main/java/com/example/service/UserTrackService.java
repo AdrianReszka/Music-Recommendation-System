@@ -8,12 +8,10 @@ import com.example.repository.UserRepository;
 import com.example.repository.UserTrackRepository;
 import com.example.repository.SpotifyUserLinkRepository;
 import com.example.repository.SpotifyUserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,11 +56,13 @@ public class UserTrackService {
         }
 
         User user = userRepository.findByLastfmUsername(username)
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setLastfmUsername(username);
-                    return userRepository.save(newUser);
-                });
+                .orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setLastfmUsername(username);
+            userRepository.save(user);
+        }
 
         if (spotifyId != null) {
             SpotifyUser spotifyUser = spotifyUserRepository.findBySpotifyId(spotifyId)

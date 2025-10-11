@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
@@ -29,6 +30,7 @@ public class LastFmService {
     private String apiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final StatsService statsService;
     private final TrackRepository trackRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
@@ -36,6 +38,7 @@ public class LastFmService {
     private final SpotifyUserRepository spotifyUserRepository;
     private final SpotifyUserLinkRepository spotifyUserLinkRepository;
 
+    @Transactional
     public List<TrackDto> fetchLovedTracks(String username, String spotifyId) {
         String url = "https://ws.audioscrobbler.com/2.0/" +
                 "?method=user.getlovedtracks" +
@@ -58,20 +61,25 @@ public class LastFmService {
         }
 
         User user = userRepository.findByLastfmUsername(username)
-                .orElseGet(() -> {
-                    User newUser = new User();
-                    newUser.setLastfmUsername(username);
-                    return userRepository.save(newUser);
-                });
+                .orElse(null);
+
+        if (user == null) {
+            user = new User();
+            user.setLastfmUsername(username);
+            userRepository.save(user);
+        }
 
         if (spotifyId != null) {
+            User finalUser = user;
             spotifyUserRepository.findBySpotifyId(spotifyId).ifPresent(spotifyUser -> {
-                boolean exists = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, user);
+                boolean exists = spotifyUserLinkRepository.existsBySpotifyUserAndUser(spotifyUser, finalUser);
                 if (!exists) {
                     SpotifyUserLink link = new SpotifyUserLink();
                     link.setSpotifyUser(spotifyUser);
-                    link.setUser(user);
+                    link.setUser(finalUser);
                     spotifyUserLinkRepository.save(link);
+
+                    statsService.updateIfIncreased();
                 }
             });
         }
@@ -135,6 +143,8 @@ public class LastFmService {
             trackRepository.save(track);
             savedTracks.add(track);
         }
+
+        statsService.updateIfIncreased();
 
         return savedTracks.stream()
                 .map(track -> new TrackDto(
@@ -302,6 +312,8 @@ public class LastFmService {
                 recommendationRepository.save(rec);
             }
         }
+
+        statsService.updateIfIncreased();
 
         return filtered.stream()
                 .map(scored -> {

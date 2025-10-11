@@ -9,6 +9,7 @@ export default function PlaylistsPanel() {
     const [tracks, setTracks] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [saved, setSaved] = useState(false);
+    const [isLoadingTracks, setIsLoadingTracks] = useState(false);
 
     const fixedPlaylistName = "BeatBridge Recommendations Playlist";
 
@@ -62,6 +63,7 @@ export default function PlaylistsPanel() {
         if (!spotifyId) return;
 
         setSaved(false);
+        setIsLoadingTracks(true);
 
         if (selectedList?.label === label) {
             setSelectedList(null);
@@ -88,7 +90,7 @@ export default function PlaylistsPanel() {
         } catch (err) {
             console.error("Error fetching tracks:", err);
         } finally {
-            setIsLoading(false);
+            setIsLoadingTracks(false);
         }
     };
 
@@ -108,7 +110,7 @@ export default function PlaylistsPanel() {
 
         const spotifyId = sessionStorage.getItem("spotify_id");
         if (!spotifyId) {
-            alert("Spotify user not logged in");
+            alert("Spotify user not logged in. Please log in to save playlists.");
             return;
         }
 
@@ -117,7 +119,7 @@ export default function PlaylistsPanel() {
             .map(track => ({ title: track.title, artist: track.artist }));
 
         if (selectedDtos.length === 0) {
-            alert("Please select at least one track");
+            alert("Please select at least one track.");
             return;
         }
 
@@ -157,7 +159,7 @@ export default function PlaylistsPanel() {
                 </h2>
 
                 <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
-                    Choose one of your generated recommendation lists and save it as a playlist directly on Spotify.
+                    Choose one of your generated recommendations lists and save it as a playlist directly on Spotify.
                 </p>
 
                 <label className="block mb-2 text-sm text-neutral-400">
@@ -167,10 +169,43 @@ export default function PlaylistsPanel() {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1">
                         <DropdownSelect
+                            key={lists.map(l => l.batchId).join(",")}
                             options={lists.map(l => l.label)}
                             placeholder="Choose a list"
                             value={selectedList?.label || ""}
                             onChange={handleListChange}
+                            onDelete={async (option) => {
+                                const selected = lists.find(l => l.label === option);
+                                if (!selected) return;
+
+                                const confirmDelete = confirm(
+                                    `Delete all recommendations for ${selected.username}?`
+                                );
+                                if (!confirmDelete) return;
+
+                                try {
+                                    const res = await fetch(
+                                        `/musicapp/recommendations/user/${selected.username}/batch/${selected.batchId}`,
+                                        { method: "DELETE" }
+                                    );
+
+                                    if (res.ok || res.status === 204) {
+                                        alert(
+                                            `All recommendations for ${selected.username} were deleted.`
+                                        );
+                                        setLists(prev => prev.filter(l => l.batchId !== selected.batchId));
+                                        setSelectedList(null);
+                                        setTracks([]);
+                                    } else {
+                                        const err = await res.text();
+                                        console.error("Failed to delete recommendation batch:", err);
+                                        alert("Failed to delete recommendation batch.");
+                                    }
+                                } catch (err) {
+                                    console.error("Error deleting recommendation batch:", err);
+                                    alert("Error deleting recommendation batch.");
+                                }
+                            }}
                         />
                     </div>
                     <PanelButton
@@ -180,6 +215,10 @@ export default function PlaylistsPanel() {
                         Save playlist
                     </PanelButton>
                 </div>
+
+                {isLoadingTracks && (
+                    <p className="text-gray-300 text-base mt-4">Loading tracks...</p>
+                )}
 
                 {isLoading ? (
                     <p className="text-gray-300 text-base mt-4">
@@ -195,7 +234,7 @@ export default function PlaylistsPanel() {
                 ) : null}
 
                 {tracks.length > 0 && (
-                    <div className="mt-8 grid sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
+                    <div className="mt-8 grid grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
                         {tracks.map((track, idx) => (
                             <label
                                 key={idx}
@@ -233,9 +272,43 @@ export default function PlaylistsPanel() {
                                 </button>
 
                                 <button
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                         e.preventDefault();
-                                        console.log(`Remove ${track.title} from list`);
+                                        if (!selectedList) return;
+
+                                        const username = selectedList.username;
+                                        const batchId = selectedList.batchId;
+
+                                        try {
+                                            const res = await fetch(`/musicapp/recommendations/user/${username}/batch/${batchId}/track/${track.id}`, {
+                                                method: "DELETE",
+                                            });
+
+                                            if (res.ok || res.status === 204) {
+                                                setTracks(prev => {
+                                                    const updated = prev.filter(t => t.id !== track.id);
+                                                    setSelectedTracks(st => st.filter(id => id !== track.id));
+
+                                                    if (updated.length === 0) {
+                                                        fetch(`/musicapp/recommendations/user/${username}/batch/${batchId}`, {
+                                                            method: "DELETE",
+                                                        }).then(() => {
+                                                            setLists(prev => prev.filter(l => l.batchId !== batchId));
+                                                            setSelectedList(null);
+                                                            setTracks([]);
+                                                            setSelectedTracks([]);
+                                                        }).catch(err => console.error("Error deleting empty batch:", err));
+                                                    }
+
+                                                    return updated;
+                                                });
+                                            } else {
+                                                const err = await res.text();
+                                                console.error("Failed to delete recommendation:", err);
+                                            }
+                                        } catch (err) {
+                                            console.error("Error deleting recommendation:", err);
+                                        }
                                     }}
                                     className="text-gray-400 hover:text-red-500 cursor-pointer transition text-lg font-bold ml-2"
                                     title="Remove track"

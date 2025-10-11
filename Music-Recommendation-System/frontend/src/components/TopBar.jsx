@@ -1,38 +1,54 @@
 import * as React from 'react';
 import { useNavigate } from "react-router-dom";
 
-function TopBar({ username, setActiveView }) {
+function TopBar({ username, setActiveView, onMenuToggle }) {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         sessionStorage.removeItem("spotify_id");
         sessionStorage.removeItem("spotify_username");
-
         navigate("/", { replace: true });
     };
 
     const handleViewChange = (view) => {
         setActiveView(view);
         setIsMenuOpen(false);
+        if (onMenuToggle) onMenuToggle(false);
+    };
+
+    const toggleMenu = () => {
+        const newState = !isMenuOpen;
+        setIsMenuOpen(newState);
+        if (onMenuToggle) onMenuToggle(newState);
     };
 
     return (
         <div
-            className={`fixed top-0 left-0 w-full h-[8vh] bg-[#1DB954] flex justify-between items-center px-8 text-gray-300 text-[1.25rem] font-bold z-10 shadow-md ${isMenuOpen ? 'border-b-2 border-black' : ''}`}
+            className={`fixed top-0 left-0 w-full h-[8vh] bg-[#1DB954] flex justify-between items-center px-8 
+                        text-gray-300 text-[1.25rem] font-bold z-20 shadow-md`}
         >
             <div className="text-[#191414] text-xl sm:text-2xl">BeatBridge</div>
 
             <div className="block sm:hidden">
                 <button
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    onClick={toggleMenu}
                     className="text-[#191414] focus:outline-none cursor-pointer hover:text-white transition duration-300"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-8 h-8">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        className={`w-8 h-8 transform transition-transform duration-300 ${
+                            isMenuOpen ? "rotate-90" : "rotate-0"
+                        }`}
+                    >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                 </button>
             </div>
+
 
             <div className="hidden sm:flex space-x-10 sm:space-x-8 flex-wrap justify-center">
                 <button
@@ -51,6 +67,11 @@ function TopBar({ username, setActiveView }) {
                     Playlists
                 </button>
                 <button
+                    onClick={() => handleViewChange('linked accounts')}
+                    className="text-[#191414] cursor-pointer hover:text-white text-lg sm:text-xl transition duration-300 focus:outline-none focus:ring-0">
+                    Linked Accounts
+                </button>
+                <button
                     onClick={handleLogout}
                     className="text-[#191414] cursor-pointer hover:text-red-500 text-lg sm:text-xl transition duration-300 focus:outline-none focus:ring-0">
                     Logout
@@ -59,8 +80,11 @@ function TopBar({ username, setActiveView }) {
 
             <div
                 className={`${
-                    isMenuOpen ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
-                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#1DB954] p-4 space-y-4 text-center overflow-hidden transition-all duration-500 shadow-lg`}
+                    isMenuOpen
+                        ? "max-h-[300px] opacity-100 translate-y-0"
+                        : "max-h-0 opacity-0 -translate-y-4"
+                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#1DB954] p-4 space-y-4 text-center overflow-hidden
+                   transition-all duration-500 ease-out shadow-lg transform z-30`}
             >
                 <button
                     onClick={() => handleViewChange('loved')}
@@ -76,6 +100,11 @@ function TopBar({ username, setActiveView }) {
                     onClick={() => handleViewChange('playlist')}
                     className="text-[#191414] cursor-pointer hover:text-white text-xl sm:text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
                     Playlists
+                </button>
+                <button
+                    onClick={() => handleViewChange('linked accounts')}
+                    className="text-[#191414] cursor-pointer hover:text-white text-xl transition duration-300 focus:outline-none focus:ring-0 w-full">
+                    Linked Accounts
                 </button>
                 <button
                     onClick={handleLogout}

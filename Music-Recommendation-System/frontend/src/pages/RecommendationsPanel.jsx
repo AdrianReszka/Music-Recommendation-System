@@ -9,6 +9,7 @@ export default function RecommendationsPanel() {
     const [selectedTracks, setSelectedTracks] = useState([]);
     const [createdFrom, setCreatedFrom] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingTracks, setIsLoadingTracks] = useState(false);
 
     useEffect(() => {
         const fetchLinkedUsers = async () => {
@@ -47,10 +48,10 @@ export default function RecommendationsPanel() {
         }
 
         setCreatedFrom("");
-
         setSelectedList(listName);
         setRecommendations([]);
         setSelectedTracks([]);
+        setIsLoadingTracks(true);
 
         const username = listName
             .replace(" loved tracks", "")
@@ -75,7 +76,8 @@ export default function RecommendationsPanel() {
             .catch((err) => {
                 console.error("Failed to fetch tracks", err);
                 setRecommendations([]);
-            });
+            })
+            .finally(() => setIsLoadingTracks(false));
     };
 
     const toggleTrack = (trackId) => {
@@ -116,7 +118,7 @@ export default function RecommendationsPanel() {
                 setCreatedFrom(username);
             } else {
                 const err = await res.text();
-                alert("Backend error: " + err);
+                alert("Unknown error: " + err);
             }
         } catch (err) {
             alert("Failed to generate recommendations");
@@ -127,14 +129,15 @@ export default function RecommendationsPanel() {
 
     return (
         <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
-            <section className="w-full max-w-[44rem] mx-auto text-center md:text-left transition-all duration-200">
+
+            <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
 
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                     Generate Recommendations
                 </h2>
 
                 <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
-                    Choose a list of loved tracks and generate new song suggestions based on them.
+                    Choose a list of your loved tracks and generate new song suggestions based on them.
                 </p>
 
                 <label className="block mb-2 text-sm text-neutral-400">
@@ -144,10 +147,12 @@ export default function RecommendationsPanel() {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1">
                         <DropdownSelect
+                            key={users.join(",")}
                             options={users.map(u => `${u} loved tracks`)}
-                            placeholder="Choose a list"
+                            placeholder="Choose a loved tracks list"
                             value={selectedList}
                             onChange={handleListChange}
+                            showDelete={false}
                         />
                     </div>
 
@@ -157,6 +162,7 @@ export default function RecommendationsPanel() {
                     >
                         Generate recommendations
                     </PanelButton>
+
                 </div>
 
                 {isLoading ? (
@@ -167,24 +173,22 @@ export default function RecommendationsPanel() {
                     <p className="text-gray-300 text-base mt-4">
                         Saved as:{" "}
                         <span className="font-bold text-white">
-                            "Recommended tracks for {createdFrom}"
-                        </span>
+                        "Recommended tracks for {createdFrom}"
+                    </span>
                     </p>
                 ) : null}
 
+                {isLoadingTracks && (
+                    <p className="text-gray-300 text-base mt-6">Loading tracks...</p>
+                )}
+
                 {recommendations.length > 0 && (
-                    <div
-                        className={`mt-8 grid sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar transition-all duration-200 ${
-                            recommendations.length === 0
-                                ? "opacity-0 scale-95"
-                                : "opacity-100 scale-100"
-                        }`}
-                    >
+                    <div className="mt-8 grid grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
                         {recommendations.map((track, idx) => (
                             <label
                                 key={idx}
                                 className="flex items-center gap-3 p-3 rounded-xl bg-[#181818] hover:bg-[#262626]
-                                           transition cursor-pointer shadow-md relative group"
+                                       transition cursor-pointer shadow-md relative group"
                             >
                                 <input
                                     type="checkbox"
@@ -197,35 +201,6 @@ export default function RecommendationsPanel() {
                                     <span className="text-white font-semibold truncate">{track.title}</span>
                                     <span className="text-gray-400 text-sm truncate">{track.artist}</span>
                                 </div>
-
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        console.log(`Play preview for ${track.title}`);
-                                    }}
-                                    className="text-[#1DB954] hover:text-white cursor-pointer transition text-lg"
-                                    title="Play preview"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="currentColor"
-                                        viewBox="0 0 24 24"
-                                        className="w-6 h-6"
-                                    >
-                                        <path d="M8 5v14l11-7z" />
-                                    </svg>
-                                </button>
-
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        console.log(`Remove ${track.title}`);
-                                    }}
-                                    className="text-gray-400 hover:text-red-500 cursor-pointer transition text-lg font-bold ml-2"
-                                    title="Remove track"
-                                >
-                                    ✕
-                                </button>
                             </label>
                         ))}
                     </div>

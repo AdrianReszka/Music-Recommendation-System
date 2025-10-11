@@ -13,6 +13,7 @@ import com.example.repository.TrackRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,8 +38,23 @@ public class RecommendationService {
         return recommendationRepository.save(recommendation);
     }
 
-    public void delete(Long id) {
-        recommendationRepository.deleteById(id);
+    @Transactional
+    public void deleteRecommendationBatch(String username, String batchId) {
+        User user = userRepository.findByLastfmUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        List<Recommendation> recs = recommendationRepository.findByUserAndBatchId(user, batchId);
+
+        if (recs.isEmpty()) {
+            throw new RuntimeException("No recommendations found for batch " + batchId);
+        }
+
+        recommendationRepository.deleteAll(recs);
+    }
+
+    @Transactional
+    public void deleteRecommendationFromBatch(String username, String batchId, Long trackId) {
+        recommendationRepository.deleteByUsernameAndBatchIdAndTrackId(username, batchId, trackId);
     }
 
     public void saveRecommendations(String username, List<TrackDto> tracks) {

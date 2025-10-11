@@ -81,10 +81,5 @@ public class UserTrackController {
     public UserTrack create(@RequestBody UserTrack track) {
         return userTrackService.create(track);
     }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        userTrackService.delete(id);
-    }
 }
 

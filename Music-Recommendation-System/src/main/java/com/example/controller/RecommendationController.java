@@ -34,9 +34,30 @@ public class RecommendationController {
         return recommendationService.create(recommendation);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteRecommendation(@PathVariable Long id) {
-        recommendationService.delete(id);
+    @DeleteMapping("/user/{username}/batch/{batchId}/track/{trackId}")
+    public ResponseEntity<String> deleteRecommendationFromBatch(
+            @PathVariable String username,
+            @PathVariable String batchId,
+            @PathVariable Long trackId) {
+        try {
+            recommendationService.deleteRecommendationFromBatch(username, batchId, trackId);
+            return ResponseEntity.ok("Recommendation removed successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/user/{username}/batch/{batchId}")
+    public ResponseEntity<Void> deleteRecommendationBatch(
+            @PathVariable String username,
+            @PathVariable String batchId) {
+        try {
+            recommendationService.deleteRecommendationBatch(username, batchId);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/users")

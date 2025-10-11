@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import UsernameInput from '../components/UsernameInput';
 import PanelButton from "../components/PanelButton.jsx";
 
@@ -6,6 +6,22 @@ export default function LovedTracksPanel() {
     const [username, setUsername] = useState('');
     const [savedAs, setSavedAs] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [stats, setStats] = useState({ totalTracks: 0, averageTracksPerUser: 0, totalLinkedAccounts: 0 });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await fetch("/musicapp/stats");
+                if (res.ok) {
+                    const data = await res.json();
+                    setStats(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch stats:", err);
+            }
+        };
+        fetchStats();
+    }, []);
 
     const handleDownload = async () => {
         if (!username.trim()) {
@@ -89,8 +105,13 @@ export default function LovedTracksPanel() {
 
                     <p className="mt-4 text-sm text-neutral-400">
                         Don't have a Last.fm account?{" "}
-                        <a href="#" className="text-[#1DB954] hover:underline">
-                            Learn more
+                        <a
+                            href="https://www.last.fm"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#1DB954] hover:text-white"
+                        >
+                            Create one here
                         </a>
                     </p>
                 </section>
@@ -108,14 +129,14 @@ export default function LovedTracksPanel() {
                     </div>
 
                     <p className="text-neutral-300 text-base sm:text-lg">
-                        Already <span className="text-[#1DB954] font-semibold">12 431</span>{" "}
-                        tracks downloaded by users!
+                        Already <span className="text-[#1DB954] font-semibold">{stats.totalTracks.toLocaleString()}</span>{" "}
+                        tracks downloaded by users
                     </p>
 
                     <div className="flex items-center gap-8">
                         <div className="text-center">
                             <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
-                                148
+                                {Math.round(stats.averageTracksPerUser)}
                             </div>
                             <div className="text-sm text-neutral-400">
                                 Average number of fetched loved tracks
@@ -123,10 +144,10 @@ export default function LovedTracksPanel() {
                         </div>
                         <div className="text-center">
                             <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
-                                3 min
+                                {stats.totalLinkedAccounts}
                             </div>
                             <div className="text-sm text-neutral-400">
-                                Average download time
+                                Total number of linked Spotify and Last.fm accounts
                             </div>
                         </div>
                     </div>
