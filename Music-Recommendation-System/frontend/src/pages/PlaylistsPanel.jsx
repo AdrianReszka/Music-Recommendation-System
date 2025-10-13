@@ -158,11 +158,11 @@ export default function PlaylistsPanel() {
                     Save Playlist
                 </h2>
 
-                <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-8 text-sm sm:text-base leading-relaxed">
                     Choose one of your generated recommendations lists and save it as a playlist directly on Spotify.
                 </p>
 
-                <label className="block mb-2 text-sm text-neutral-400">
+                <label className="block mb-2 text-sm text-gray-400">
                     Select recommendations list
                 </label>
 
@@ -234,21 +234,21 @@ export default function PlaylistsPanel() {
                 ) : null}
 
                 {tracks.length > 0 && (
-                    <div className="mt-8 grid grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
+                    <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
                         {tracks.map((track, idx) => (
                             <label
                                 key={idx}
-                                className="flex items-center gap-3 p-3 rounded-xl bg-[#181818] hover:bg-[#262626]
+                                className="flex items-center gap-3 p-3 rounded-xl bg-[#1f1f1f] hover:bg-[#262626]
                                        transition cursor-pointer shadow-md relative group"
                             >
                                 <input
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954]"
+                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0"
                                 />
 
-                                <div className="flex flex-col overflow-hidden flex-grow">
+                                <div className="flex flex-col overflow-hidden min-w-0 flex-1">
                                     <span className="text-white font-semibold truncate">{track.title}</span>
                                     <span className="text-gray-400 text-sm truncate">{track.artist}</span>
                                 </div>
@@ -258,7 +258,7 @@ export default function PlaylistsPanel() {
                                         e.preventDefault();
                                         console.log(`Play preview for ${track.title}`);
                                     }}
-                                    className="text-[#1DB954] hover:text-white cursor-pointer transition text-lg"
+                                    className="text-[#1DB954] hover:text-white cursor-pointer transition text-lg flex-shrink-0"
                                     title="Play preview"
                                 >
                                     <svg
@@ -310,7 +310,7 @@ export default function PlaylistsPanel() {
                                             console.error("Error deleting recommendation:", err);
                                         }
                                     }}
-                                    className="text-gray-400 hover:text-red-500 cursor-pointer transition text-lg font-bold ml-2"
+                                    className="text-gray-400 hover:text-red-500 cursor-pointer transition text-lg font-bold ml-2 flex-shrink-0"
                                     title="Remove track"
                                 >
                                     ✕

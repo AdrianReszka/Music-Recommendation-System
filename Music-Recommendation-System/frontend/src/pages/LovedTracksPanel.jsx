@@ -73,12 +73,12 @@ export default function LovedTracksPanel() {
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                         Download Loved Tracks
                     </h2>
-                    <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                    <p className="text-gray-300 mb-8 text-sm sm:text-base leading-relaxed">
                         Download your favorite tracks from Last.fm and sync them with BeatBridge.
                         Keep all your musical gems in one place.
                     </p>
 
-                    <label className="block mb-2 text-sm text-neutral-400">
+                    <label className="block mb-2 text-sm text-gray-400">
                         Enter Your Last.fm username
                     </label>
                     <div className="flex flex-col sm:flex-row gap-3">
@@ -103,7 +103,7 @@ export default function LovedTracksPanel() {
                         </p>
                     ) : null}
 
-                    <p className="mt-4 text-sm text-neutral-400">
+                    <p className="mt-4 text-sm text-gray-400">
                         Don't have a Last.fm account?{" "}
                         <a
                             href="https://www.last.fm"
@@ -128,7 +128,7 @@ export default function LovedTracksPanel() {
                         </svg>
                     </div>
 
-                    <p className="text-neutral-300 text-base sm:text-lg">
+                    <p className="text-gray-300 text-base sm:text-lg">
                         Already <span className="text-[#1DB954] font-semibold">{stats.totalTracks.toLocaleString()}</span>{" "}
                         tracks downloaded by users
                     </p>
@@ -138,7 +138,7 @@ export default function LovedTracksPanel() {
                             <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
                                 {Math.round(stats.averageTracksPerUser)}
                             </div>
-                            <div className="text-sm text-neutral-400">
+                            <div className="text-sm text-gray-400">
                                 Average number of fetched loved tracks
                             </div>
                         </div>
@@ -146,7 +146,7 @@ export default function LovedTracksPanel() {
                             <div className="text-2xl sm:text-3xl font-bold text-[#1DB954]">
                                 {stats.totalLinkedAccounts}
                             </div>
-                            <div className="text-sm text-neutral-400">
+                            <div className="text-sm text-gray-400">
                                 Total number of linked Spotify and Last.fm accounts
                             </div>
                         </div>

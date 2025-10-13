@@ -54,3 +54,10 @@ h1 {
 .hide-scrollbar {
   scrollbar-width: none;
 }
+
+li:focus,
+button:focus,
+div:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}

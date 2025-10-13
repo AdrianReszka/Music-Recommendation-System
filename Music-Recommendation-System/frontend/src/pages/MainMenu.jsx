@@ -34,7 +34,7 @@ function MainMenu() {
         >
             <TopBar username={username} setActiveView={setActiveView} onMenuToggle={setMenuOpen} />
 
-            <div className="relative flex-1 text-white p-8 overflow-y-auto bg-black/40 backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
+            <div className="relative flex-1 text-white p-8 overflow-y-auto z backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
                 <div
                     className={`absolute inset-0 bg-black transition-opacity duration-500 pointer-events-none ${
                         menuOpen ? "opacity-40" : "opacity-0"

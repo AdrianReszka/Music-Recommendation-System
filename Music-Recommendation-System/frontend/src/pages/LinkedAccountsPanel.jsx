@@ -74,11 +74,11 @@ export default function LinkedAccountsPanel() {
                     Manage Linked Accounts
                 </h2>
 
-                <p className="text-neutral-300 mb-8 text-sm sm:text-base leading-relaxed">
+                <p className="text-gray-300 mb-8 text-sm sm:text-base leading-relaxed">
                     View your connected Last.fm accounts and remove links when needed.
                 </p>
 
-                <label className="block mb-2 text-sm text-neutral-400">
+                <label className="block mb-2 text-sm text-gray-400">
                     Linked Last.fm accounts
                 </label>
 
