@@ -24,7 +24,7 @@ public class Track {
     private String source;
     private String spotifyId;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "track_tag",
             joinColumns = @JoinColumn(name = "track_id"),
