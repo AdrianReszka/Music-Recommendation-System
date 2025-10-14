@@ -103,7 +103,7 @@ public class SpotifyService {
         spotifyUserRepository.save(user);
     }
 
-    private String searchSpotifyTrack(String accessToken, String title, String artist) {
+    public String searchSpotifyTrack(String accessToken, String title, String artist) {
         try {
             String query = URLEncoder.encode(title + " " + artist, StandardCharsets.UTF_8);
             String url = "https://api.spotify.com/v1/search?q=" + query + "&type=track&limit=1";

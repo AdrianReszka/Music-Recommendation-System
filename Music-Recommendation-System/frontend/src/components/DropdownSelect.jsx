@@ -62,7 +62,7 @@ export default function DropdownSelect({ options, placeholder, value, onChange, 
                                 key={index}
                                 onClick={() => handleSelect(option)}
                                 className={`flex items-center justify-between px-4 py-2 text-lg text-white cursor-pointer
-                                           hover:bg-[#2a2a2a] transition-all duration-200 focus:outline-none
+                                           hover:bg-[#1f1f1f] transition-all duration-200 focus:outline-none
                                            ${index !== options.length - 1 ? 'border-b border-white' : ''}
                                            ${index !== options.length - 1 ? 'hover:border-white' : ''}`}
                             >

@@ -32,6 +32,7 @@ public class LastFmService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final StatsService statsService;
+    private final SpotifyService spotifyService;
     private final TrackRepository trackRepository;
     private final TagRepository tagRepository;
     private final UserRepository userRepository;
@@ -249,6 +250,23 @@ public class LastFmService {
 
         if (!recommendations.isEmpty())
             recommendationRepository.saveAll(recommendations);
+
+        String accessToken = spotifyUser.getAccessToken();
+
+        topScored.stream()
+                .map(ScoredTrack::track)
+                .filter(t -> t.getSpotifyId() == null || t.getSpotifyId().isBlank())
+                .forEach(track -> {
+                    try {
+                        var id = spotifyService.searchSpotifyTrack(accessToken, track.getTitle(), track.getArtist());
+                        if (id != null) {
+                            track.setSpotifyId(id);
+                            trackRepository.save(track);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Could not fetch Spotify ID for " + track.getTitle() + ": " + e.getMessage());
+                    }
+                });
 
         statsService.updateIfIncreased();
 

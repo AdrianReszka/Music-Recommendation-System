@@ -3,6 +3,7 @@ package com.example.service;
 import com.example.dto.TagDto;
 import com.example.dto.TrackDto;
 import com.example.model.Recommendation;
+import com.example.model.SpotifyUser;
 import com.example.model.Track;
 import com.example.model.User;
 import com.example.repository.RecommendationRepository;
@@ -77,17 +78,8 @@ public class RecommendationService {
         User user = userRepository.findByLastfmUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
-        if (spotifyId == null || spotifyId.isEmpty()) {
-            throw new RuntimeException("Spotify ID is required");
-        }
-
-        var su = spotifyUserRepository.findBySpotifyId(spotifyId)
+        SpotifyUser spotifyUser = spotifyUserRepository.findBySpotifyId(spotifyId)
                 .orElseThrow(() -> new SecurityException("Spotify account not found"));
-        boolean isLinked = spotifyUserLinkRepository.existsBySpotifyUserAndUser(su, user);
-
-        if (!isLinked) {
-            throw new SecurityException("This Last.fm user is not linked with your Spotify account");
-        }
 
         if (batchId == null || batchId.isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -120,7 +112,8 @@ public class RecommendationService {
                             t.getSpotifyId(),
                             t.getLastfmId(),
                             t.getSource(),
-                            t.getTags().stream().map(tag -> {
+                            t.getTags().stream()
+                                    .map(tag -> {
                                 TagDto dto = new TagDto();
                                 dto.setName(tag.getName());
                                 return dto;

@@ -256,10 +256,21 @@ export default function PlaylistsPanel() {
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        console.log(`Play preview for ${track.title}`);
+
+                                        if (!track.spotifyId) {
+                                            alert("No Spotify link available for this track.");
+                                            return;
+                                        }
+
+                                        const cleanId = track.spotifyId.includes(":")
+                                            ? track.spotifyId.split(":").pop()
+                                            : track.spotifyId;
+
+                                        const spotifyUrl = `https://open.spotify.com/track/${cleanId}`;
+                                        window.open(spotifyUrl, "_blank");
                                     }}
-                                    className="text-[#1DB954] hover:text-white cursor-pointer transition text-lg flex-shrink-0"
-                                    title="Play preview"
+                                    className="text-[#1DB954] hover:text-[#1ED760] cursor-pointer transition text-lg flex-shrink-0"
+                                    title="Open on Spotify"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
