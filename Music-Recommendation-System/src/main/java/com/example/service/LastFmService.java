@@ -315,6 +315,10 @@ public class LastFmService {
                 .filter(scored -> scored.score() >= 6)
                 .toList();
 
+        if (topScored.isEmpty()) {
+            throw new NoSuchElementException("No recommendations found for selected tracks.");
+        }
+
         String batchId = UUID.randomUUID().toString();
         LocalDateTime now = LocalDateTime.now();
 
@@ -335,8 +339,11 @@ public class LastFmService {
                 })
                 .toList();
 
-        if (!recommendations.isEmpty())
-            recommendationRepository.saveAll(recommendations);
+        if (recommendations.isEmpty()) {
+            throw new IllegalStateException("Recommendations for this selection already exist.");
+        }
+
+        recommendationRepository.saveAll(recommendations);
 
         statsService.updateIfIncreased();
 

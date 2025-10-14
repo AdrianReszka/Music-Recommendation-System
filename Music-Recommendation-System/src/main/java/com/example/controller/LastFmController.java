@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/musicapp/lastfm")
@@ -25,14 +27,25 @@ public class LastFmController {
     }
 
     @PostMapping("/similar")
-    public ResponseEntity<List<TrackDto>> getSimilarTracks(
+    public ResponseEntity<?> fetchSimilarTracks(
             @RequestParam String username,
             @RequestParam String spotifyId,
-            @RequestBody List<Long> selectedTrackIds
-    ) {
-        List<TrackDto> result = lastFmService.fetchSimilarTracksForUser(username, spotifyId, selectedTrackIds);
-        return ResponseEntity.ok(result);
+            @RequestBody List<Long> trackIds) {
+        try {
+            List<TrackDto> recommendations = lastFmService.fetchSimilarTracksForUser(username, spotifyId, trackIds);
+            return ResponseEntity.ok(recommendations);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(409).body(Map.of("message", e.getMessage()));
+
+        } catch (SecurityException e) {
+            return ResponseEntity.status(403).body(Map.of("error", e.getMessage()));
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", e.getMessage()));
+        }
     }
-
-
 }

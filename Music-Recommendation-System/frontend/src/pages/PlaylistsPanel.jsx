@@ -245,7 +245,7 @@ export default function PlaylistsPanel() {
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0"
+                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0 cursor-pointer"
                                 />
 
                                 <div className="flex flex-col overflow-hidden min-w-0 flex-1">

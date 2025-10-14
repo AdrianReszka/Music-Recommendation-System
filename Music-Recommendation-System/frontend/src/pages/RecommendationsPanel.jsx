@@ -10,6 +10,7 @@ export default function RecommendationsPanel() {
     const [createdFrom, setCreatedFrom] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingTracks, setIsLoadingTracks] = useState(false);
+    const [noResultsMessage, setNoResultsMessage] = useState("");
 
     useEffect(() => {
         const fetchLinkedUsers = async () => {
@@ -113,7 +114,13 @@ export default function RecommendationsPanel() {
                 body: JSON.stringify(selectedTracks)
             });
 
-            if (res.ok) {
+            if (res.status === 404) {
+                const msg = (await res.json())?.message || "No recommendations found.";
+                alert(msg);
+            } else if (res.status === 409) {
+                const msg = (await res.json())?.message || "Recommendations already exist for this selection.";
+                alert(msg);
+            } else if (res.ok) {
                 await res.json();
                 setCreatedFrom(username);
             } else {
@@ -123,7 +130,7 @@ export default function RecommendationsPanel() {
         } catch (err) {
             alert("Failed to generate recommendations");
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -194,7 +201,7 @@ export default function RecommendationsPanel() {
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0"
+                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0 cursor-pointer"
                                 />
 
                                 <div className="flex flex-col overflow-hidden min-w-0 flex-1">
