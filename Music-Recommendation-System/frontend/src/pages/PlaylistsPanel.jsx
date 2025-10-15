@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DropdownSelect from "../components/DropdownSelect.jsx";
 import PanelButton from "../components/PanelButton.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function PlaylistsPanel() {
     const [lists, setLists] = useState([]);
@@ -149,8 +150,12 @@ export default function PlaylistsPanel() {
         }
     };
 
+    const overlayVisible = isLoading || isLoadingTracks;
+    const overlayText = isLoading ? "Saving playlist..." : "Loading tracks...";
+
     return (
         <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
+            <LoadingOverlay visible={overlayVisible} text={overlayText} />
 
             <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
 
@@ -216,15 +221,7 @@ export default function PlaylistsPanel() {
                     </PanelButton>
                 </div>
 
-                {isLoadingTracks && (
-                    <p className="text-gray-300 text-base mt-4">Loading tracks...</p>
-                )}
-
-                {isLoading ? (
-                    <p className="text-gray-300 text-base mt-4">
-                        Saving playlist...
-                    </p>
-                ) : saved ? (
+                {saved ? (
                     <p className="text-gray-300 text-base mt-4">
                         Saved as:{" "}
                         <span className="font-bold text-white">
@@ -245,7 +242,7 @@ export default function PlaylistsPanel() {
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0 cursor-pointer"
+                                    className="w-5 h-5 accent-[#1DB954] hover:text-[#1DB954]/60 flex-shrink-0 cursor-pointer"
                                 />
 
                                 <div className="flex flex-col overflow-hidden min-w-0 flex-1">
@@ -263,13 +260,13 @@ export default function PlaylistsPanel() {
                                         }
 
                                         const cleanId = track.spotifyId.includes(":")
-                                            ? track.spotifyId.split(":").pop()
+                                            ? track.getSpotifyId.split(":").pop()
                                             : track.spotifyId;
 
                                         const spotifyUrl = `https://open.spotify.com/track/${cleanId}`;
                                         window.open(spotifyUrl, "_blank");
                                     }}
-                                    className="text-[#1DB954] hover:text-[#1ED760] cursor-pointer transition text-lg flex-shrink-0"
+                                    className="text-[#1DB954] hover:text-[#1DB954]/60 cursor-pointer transition text-lg flex-shrink-0"
                                     title="Open on Spotify"
                                 >
                                     <svg

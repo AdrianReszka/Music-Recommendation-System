@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import UsernameInput from '../components/UsernameInput';
 import PanelButton from "../components/PanelButton.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function LovedTracksPanel() {
     const [username, setUsername] = useState('');
@@ -65,8 +66,13 @@ export default function LovedTracksPanel() {
         }
     };
 
+    const overlayVisible = isLoading;
+    const overlayText = "Fetching loved tracks...";
+
     return (
         <div className="w-full min-h-[100vh] text-white flex items-center justify-center px-4">
+            <LoadingOverlay visible={overlayVisible} text={overlayText} />
+
             <div className="grid md:grid-cols-2 items-center justify-center w-full max-w-[calc(100%-2*12.5vw)] gap-12">
 
                 <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
@@ -92,11 +98,7 @@ export default function LovedTracksPanel() {
                         </PanelButton>
                     </div>
 
-                    {isLoading ? (
-                        <p className="text-gray-300 text-base mt-4">
-                            Fetching loved tracks...
-                        </p>
-                    ) : savedAs ? (
+                    {savedAs ? (
                         <p className="text-gray-300 text-base mt-4">
                             Saved as:{" "}
                             <span className="font-bold text-white">"{savedAs}"</span>

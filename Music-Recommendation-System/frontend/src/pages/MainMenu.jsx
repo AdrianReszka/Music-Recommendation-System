@@ -5,6 +5,7 @@ import LovedTracksPanel from "./LovedTracksPanel.jsx";
 import RecommendationsPanel from "./RecommendationsPanel.jsx";
 import PlaylistsPanel from "./PlaylistsPanel.jsx";
 import LinkedAccountsPanel from "./LinkedAccountsPanel.jsx";
+import DimOverlay from '../components/DimOverlay.jsx';
 
 function MainMenu() {
     const [activeView, setActiveView] = useState('loved');
@@ -32,18 +33,16 @@ function MainMenu() {
                 backgroundAttachment: 'fixed'
             }}
         >
-            <TopBar username={username} setActiveView={setActiveView} onMenuToggle={setMenuOpen} />
+            <div className="relative z-[1100]">
+                <TopBar username={username} setActiveView={setActiveView} onMenuToggle={setMenuOpen} />
+            </div>
 
-            <div className="relative flex-1 text-white p-8 overflow-y-auto z backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
-                <div
-                    className={`absolute inset-0 bg-black transition-opacity duration-500 pointer-events-none ${
-                        menuOpen ? "opacity-40" : "opacity-0"
-                    }`}
-                ></div>
+            <DimOverlay visible={menuOpen} onClick={() => setMenuOpen(false)} zIndex={1000} />
 
-                {activeView === 'loved' && <LovedTracksPanel />}
-                {activeView === 'recommend' && <RecommendationsPanel />}
-                {activeView === 'playlist' && <PlaylistsPanel />}
+            <div className="relative flex-1 text-white p-8 overflow-y-auto backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
+                {activeView === 'loved' && <LovedTracksPanel/>}
+                {activeView === 'recommend' && <RecommendationsPanel/>}
+                {activeView === 'playlist' && <PlaylistsPanel/>}
                 {activeView === 'linked accounts' && <LinkedAccountsPanel />}
             </div>
         </div>

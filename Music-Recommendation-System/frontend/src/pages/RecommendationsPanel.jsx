@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PanelButton from "../components/PanelButton.jsx";
 import DropdownSelect from "../components/DropdownSelect.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function RecommendationsPanel() {
     const [users, setUsers] = useState([]);
@@ -134,11 +135,14 @@ export default function RecommendationsPanel() {
         }
     };
 
+    const overlayVisible = isLoading || isLoadingTracks;
+    const overlayText = isLoading ? "Generating recommendations..." : "Loading tracks...";
+
     return (
         <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
+            <LoadingOverlay visible={overlayVisible} text={overlayText} />
 
             <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
-
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                     Generate Recommendations
                 </h2>
@@ -169,25 +173,16 @@ export default function RecommendationsPanel() {
                     >
                         Generate recommendations
                     </PanelButton>
-
                 </div>
 
-                {isLoading ? (
-                    <p className="text-gray-300 text-base mt-4">
-                        Generating recommendations...
-                    </p>
-                ) : createdFrom ? (
+                {createdFrom ? (
                     <p className="text-gray-300 text-base mt-4">
                         Saved as:{" "}
                         <span className="font-bold text-white">
-                        "Recommended tracks for {createdFrom}"
-                    </span>
+                            "Recommended tracks for {createdFrom}"
+                        </span>
                     </p>
                 ) : null}
-
-                {isLoadingTracks && (
-                    <p className="text-gray-300 text-base mt-6">Loading tracks...</p>
-                )}
 
                 {recommendations.length > 0 && (
                     <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-2 hide-scrollbar">
@@ -201,7 +196,7 @@ export default function RecommendationsPanel() {
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954] flex-shrink-0 cursor-pointer"
+                                    className="w-5 h-5 accent-[#1DB954] hover:text-[#1DB954]/60 flex-shrink-0 cursor-pointer"
                                 />
 
                                 <div className="flex flex-col overflow-hidden min-w-0 flex-1">

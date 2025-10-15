@@ -98,7 +98,7 @@ function TopBar({ username, setActiveView, onMenuToggle }) {
                     isMenuOpen
                         ? "max-h-[300px] opacity-100 translate-y-0"
                         : "max-h-0 opacity-0 -translate-y-4"
-                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#17a34a] p-4 space-y-4 text-center overflow-hidden
+                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#1DB954]/60 p-4 space-y-4 text-center overflow-hidden
                    transition-all duration-500 ease-out shadow-lg transform z-30`}
             >
                 <button
