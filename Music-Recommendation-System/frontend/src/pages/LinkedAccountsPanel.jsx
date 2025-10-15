@@ -101,9 +101,10 @@ export default function LinkedAccountsPanel() {
 
                     <PanelButton
                         onMouseDown={() => document.activeElement.blur()}
-                        onClick={() => handleUnlink(selectedUser)}
-                        disabled={!selectedUser || isLoading}
-                        className={`bg-red-600 hover:bg-red-700 ${(!selectedUser || isLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
+                        onClick={() => {
+                            if (!selectedUser || isLoading) return;
+                            handleUnlink(selectedUser);
+                        }}
                     >
                         Unlink account
                     </PanelButton>
