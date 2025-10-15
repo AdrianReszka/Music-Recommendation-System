@@ -102,7 +102,11 @@ export default function LinkedAccountsPanel() {
                     <PanelButton
                         onMouseDown={() => document.activeElement.blur()}
                         onClick={() => {
-                            if (!selectedUser || isLoading) return;
+                            if (isLoading) return;
+                            if (!selectedUser) {
+                                alert("Please select a Last.fm account to unlink.");
+                                return;
+                            }
                             handleUnlink(selectedUser);
                         }}
                     >

@@ -1,7 +1,6 @@
 package com.example.controller;
 
 import com.example.dto.TrackDto;
-import com.example.model.Track;
 import com.example.service.LastFmService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
