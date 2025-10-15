@@ -11,7 +11,7 @@ export default function RecommendationsPanel() {
     const [createdFrom, setCreatedFrom] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingTracks, setIsLoadingTracks] = useState(false);
-    const [noResultsMessage, setNoResultsMessage] = useState("");
+    const [, setNoResultsMessage] = useState("");
 
     useEffect(() => {
         const fetchLinkedUsers = async () => {

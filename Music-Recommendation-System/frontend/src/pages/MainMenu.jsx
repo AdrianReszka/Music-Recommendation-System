@@ -6,8 +6,9 @@ import RecommendationsPanel from "./RecommendationsPanel.jsx";
 import PlaylistsPanel from "./PlaylistsPanel.jsx";
 import LinkedAccountsPanel from "./LinkedAccountsPanel.jsx";
 import DimOverlay from '../components/DimOverlay.jsx';
+import { UIProvider } from '../context/UIContext.jsx';
 
-function MainMenu() {
+export default function MainMenu() {
     const [activeView, setActiveView] = useState('loved');
     const [username, setUsername] = useState('');
     const [menuOpen, setMenuOpen] = useState(false);
@@ -24,29 +25,32 @@ function MainMenu() {
     }, [navigate]);
 
     return (
-        <div
-            className="w-screen h-screen flex flex-col overflow-hidden"
-            style={{
-                backgroundImage: 'url(/images/background.jpg)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundAttachment: 'fixed'
-            }}
-        >
-            <div className="relative z-[1100]">
-                <TopBar username={username} setActiveView={setActiveView} onMenuToggle={setMenuOpen} />
-            </div>
+        <UIProvider menuOpen={menuOpen} setMenuOpen={setMenuOpen}>
+            <div
+                className="w-screen h-screen flex flex-col overflow-hidden"
+                style={{
+                    backgroundImage: 'url(/images/background.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundAttachment: 'fixed'
+                }}
+            >
+                <div className="relative z-[1100]">
+                    <TopBar username={username} setActiveView={(view) => {
+                        setActiveView(view);
+                        setMenuOpen(false);
+                    }} onMenuToggle={setMenuOpen} />
+                </div>
 
-            <DimOverlay visible={menuOpen} onClick={() => setMenuOpen(false)} zIndex={1000} />
+                <DimOverlay visible={menuOpen} onClick={() => setMenuOpen(false)} zIndex={1000} />
 
-            <div className="relative flex-1 text-white p-8 overflow-y-auto backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
-                {activeView === 'loved' && <LovedTracksPanel/>}
-                {activeView === 'recommend' && <RecommendationsPanel/>}
-                {activeView === 'playlist' && <PlaylistsPanel/>}
-                {activeView === 'linked accounts' && <LinkedAccountsPanel />}
+                <div className="relative flex-1 text-white p-8 overflow-y-auto backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
+                    {activeView === 'loved' && <LovedTracksPanel />}
+                    {activeView === 'recommend' && <RecommendationsPanel />}
+                    {activeView === 'playlist' && <PlaylistsPanel />}
+                    {activeView === 'linked accounts' && <LinkedAccountsPanel />}
+                </div>
             </div>
-        </div>
+        </UIProvider>
     );
 }
-
-export default MainMenu;
