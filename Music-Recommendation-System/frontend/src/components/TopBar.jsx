@@ -53,7 +53,7 @@ export default function TopBar({ username, setActiveView, onMenuToggle }) {
 
     return (
         <div
-            className={`fixed top-0 left-0 w-full h-[8vh] bg-[#1DB954] flex justify-between items-center px-4 sm:px-6 lg:px-8 
+            className={`fixed top-0 left-0 w-full h-[8vh] shadow-2xl bg-[#1DB954] flex justify-between items-center px-4 sm:px-6 lg:px-8 
                         text-gray-300 text-[1.25rem] font-bold z-20`}
         >
             <div className="text-[#1f1f1f] text-base sm:text-lg md:text-xl lg:text-2xl whitespace-nowrap">
@@ -104,7 +104,7 @@ export default function TopBar({ username, setActiveView, onMenuToggle }) {
                     isMenuOpen
                         ? "max-h-[300px] opacity-100 translate-y-0"
                         : "max-h-0 opacity-0 -translate-y-4"
-                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#1DB954]/60 p-4 space-y-4 text-center overflow-hidden
+                } sm:hidden absolute top-[8vh] left-0 w-full bg-[#17a34a] p-4 space-y-4 text-center overflow-hidden
                    transition-all duration-500 ease-out shadow-lg transform z-30`}
             >
                 <button onClick={() => handleViewChange('loved')} className="text-[#1f1f1f] hover:text-white cursor-pointer text-xl transition w-full">

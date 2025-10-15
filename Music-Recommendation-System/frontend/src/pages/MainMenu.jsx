@@ -35,14 +35,22 @@ export default function MainMenu() {
                     backgroundAttachment: 'fixed'
                 }}
             >
-                <div className="relative z-[1100]">
-                    <TopBar username={username} setActiveView={(view) => {
-                        setActiveView(view);
-                        setMenuOpen(false);
-                    }} onMenuToggle={setMenuOpen} />
-                </div>
+                <DimOverlay
+                    visible={menuOpen}
+                    onClick={() => setMenuOpen(false)}
+                    zIndex={1000}
+                />
 
-                <DimOverlay visible={menuOpen} onClick={() => setMenuOpen(false)} zIndex={1000} />
+                <div className="relative z-[1300]">
+                    <TopBar
+                        username={username}
+                        setActiveView={(view) => {
+                            setActiveView(view);
+                            setMenuOpen(false);
+                        }}
+                        onMenuToggle={setMenuOpen}
+                    />
+                </div>
 
                 <div className="relative flex-1 text-white p-8 overflow-y-auto backdrop-blur-md m-0 rounded-lg transition-colors duration-500">
                     {activeView === 'loved' && <LovedTracksPanel />}

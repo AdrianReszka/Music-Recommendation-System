@@ -242,7 +242,7 @@ export default function PlaylistsPanel() {
                                     type="checkbox"
                                     checked={selectedTracks.includes(track.id)}
                                     onChange={() => toggleTrack(track.id)}
-                                    className="w-5 h-5 accent-[#1DB954] hover:text-[#1DB954]/60 flex-shrink-0 cursor-pointer"
+                                    className="w-5 h-5 accent-[#1DB954] hover:text-[#17a34a] flex-shrink-0 cursor-pointer"
                                 />
 
                                 <div className="flex flex-col overflow-hidden min-w-0 flex-1">
@@ -266,7 +266,7 @@ export default function PlaylistsPanel() {
                                         const spotifyUrl = `https://open.spotify.com/track/${cleanId}`;
                                         window.open(spotifyUrl, "_blank");
                                     }}
-                                    className="text-[#1DB954] hover:text-[#1DB954]/60 cursor-pointer transition text-lg flex-shrink-0"
+                                    className="text-[#1DB954] hover:text-[#17a34a] cursor-pointer transition text-lg flex-shrink-0"
                                     title="Open on Spotify"
                                 >
                                     <svg

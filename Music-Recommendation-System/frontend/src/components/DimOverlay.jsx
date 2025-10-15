@@ -6,7 +6,7 @@ export default function DimOverlay({ visible, onClick, zIndex = 1000 }) {
     return (
         <div
             onClick={onClick}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-black/60 transition-opacity duration-300"
             style={{ zIndex }}
         />
     );

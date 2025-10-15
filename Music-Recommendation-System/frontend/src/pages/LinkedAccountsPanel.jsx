@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DropdownSelect from "../components/DropdownSelect.jsx";
 import PanelButton from "../components/PanelButton.jsx";
+import LoadingOverlay from "../components/LoadingOverlay.jsx";
 
 export default function LinkedAccountsPanel() {
     const [linkedUsers, setLinkedUsers] = useState([]);
@@ -67,8 +68,13 @@ export default function LinkedAccountsPanel() {
         }
     };
 
+    const overlayVisible = isLoading;
+    const overlayText = "Unlinking account...";
+
     return (
         <div className="w-full min-h-[100vh] flex items-center justify-center px-6">
+            <LoadingOverlay visible={overlayVisible} text={overlayText} />
+
             <section className="w-full max-w-[44rem] mx-auto text-center md:text-left">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
                     Manage Linked Accounts
@@ -96,16 +102,12 @@ export default function LinkedAccountsPanel() {
                     <PanelButton
                         onMouseDown={() => document.activeElement.blur()}
                         onClick={() => handleUnlink(selectedUser)}
-                        disabled={!selectedUser}
-                        className={`bg-red-600 hover:bg-red-700 ${!selectedUser ? "opacity-50 cursor-not-allowed" : ""}`}
+                        disabled={!selectedUser || isLoading}
+                        className={`bg-red-600 hover:bg-red-700 ${(!selectedUser || isLoading) ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                         Unlink account
                     </PanelButton>
                 </div>
-
-                {isLoading && (
-                    <p className="text-gray-300 text-base mt-4">Unlinking account...</p>
-                )}
 
                 {message && (
                     <p className="mt-4 text-base text-gray-300 transition-all duration-500">
