@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
@@ -126,7 +127,7 @@ public class LastFmService {
                                     String tagName = (String) tagMap.get("name");
                                     if (tagName != null) {
                                         tagNames.add(tagName);
-                                        if (++cnt >= 10) break; // limit do 10
+                                        if (++cnt >= 10) break;
                                     }
                                 }
                             }
@@ -215,7 +216,6 @@ public class LastFmService {
 
         List<Track> selectedTracks = trackRepository.findAllWithTagsByIdIn(selectedTrackIds);
 
-        // FAZA 1: zlicz kandydatów tylko po similar (bez tagów/Spotify ID)
         ExecutorService pool = Executors.newFixedThreadPool(Math.min(Math.max(selectedTracks.size(), 1), 8));
         Map<String, Integer> matchCounts = new ConcurrentHashMap<>();
 
@@ -279,7 +279,6 @@ public class LastFmService {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        // FAZA 2: przygotuj encje kandydatów i dociągnij tagi tylko tam gdzie brakuje
         Map<String, Track> keyToTrack = new LinkedHashMap<>();
         List<Track> newTracks = new ArrayList<>();
         for (String key : topKKeys) {
@@ -438,15 +437,6 @@ public class LastFmService {
             throw new NoSuchElementException("No recommendations found for selected tracks.");
         }
 
-        System.out.println("Top vector-scored candidates for user=" + username + " (limit=25):");
-        for (Scored s : scored.stream()
-                .sorted(Comparator.comparingDouble((Scored x) -> x.score).reversed())
-                .limit(25).toList()) {
-            System.out.println(String.format("  score=%.3f (cos=%.3f, match=%d) | %s - %s",
-                    s.score, s.cosine, s.match,
-                    s.t.getArtist(), s.t.getTitle()));
-        }
-
         List<Track> needSpotify = finalTracks.stream()
                 .filter(t -> t.getSpotifyId() == null || t.getSpotifyId().isBlank())
                 .toList();
@@ -469,7 +459,7 @@ public class LastFmService {
         }
 
         String batchId = UUID.randomUUID().toString();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Europe/Warsaw"));
 
         List<Recommendation> recommendations = finalTracks.stream()
                 .filter(t -> !recommendationRepository.existsByUserAndTrack(user, t))
