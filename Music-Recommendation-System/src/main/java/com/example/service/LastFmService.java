@@ -429,7 +429,7 @@ public class LastFmService {
         List<Track> finalTracks = scored.stream()
                 .sorted(Comparator.comparingDouble((Scored s) -> s.score).reversed())
                 .filter(s -> s.score >= THRESHOLD)
-                .limit(25)
+                .limit(30)
                 .map(s -> s.t)
                 .toList();
 

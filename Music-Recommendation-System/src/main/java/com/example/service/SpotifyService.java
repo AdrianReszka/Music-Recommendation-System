@@ -172,8 +172,6 @@ public class SpotifyService {
         String addTracksUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
         Map<String, Object> tracksBody = Map.of("uris", trackUris);
 
-        System.out.println("Dodaje do playlisty " + FIXED_PLAYLIST_NAME + " utwory: " + trackUris);
-
         restTemplate.postForEntity(addTracksUrl, new HttpEntity<>(tracksBody, headers), Void.class);
     }
 }
