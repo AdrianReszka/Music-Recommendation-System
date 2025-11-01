@@ -27,7 +27,6 @@ class RecommendationServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private TrackRepository trackRepository;
     @Mock private SpotifyUserRepository spotifyUserRepository;
-    @Mock private SpotifyUserLinkRepository spotifyUserLinkRepository;
 
     @InjectMocks private RecommendationService service;
 

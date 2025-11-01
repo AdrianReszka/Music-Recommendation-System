@@ -4,7 +4,6 @@ import com.example.dto.TrackDto;
 import com.example.model.*;
 import com.example.repository.*;
 import com.example.service.LastFmService;
-import com.example.service.SpotifyService;
 import com.example.service.StatsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,11 +23,8 @@ import static org.mockito.Mockito.*;
 class LastFmServiceTest {
 
     @Mock private StatsService statsService;
-    @Mock private SpotifyService spotifyService;
     @Mock private TrackRepository trackRepository;
-    @Mock private TagRepository tagRepository;
     @Mock private UserRepository userRepository;
-    @Mock private RecommendationRepository recommendationRepository;
     @Mock private SpotifyUserRepository spotifyUserRepository;
     @Mock private SpotifyUserLinkRepository spotifyUserLinkRepository;
     @Mock private RestTemplate restTemplate;
