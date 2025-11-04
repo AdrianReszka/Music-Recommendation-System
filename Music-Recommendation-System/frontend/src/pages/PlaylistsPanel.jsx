@@ -259,8 +259,8 @@ export default function PlaylistsPanel() {
                                             return;
                                         }
 
-                                        const cleanId = track.spotifyId.includes(":")
-                                            ? track.getSpotifyId.split(":").pop()
+                                        const cleanId = track.spotifyId && track.spotifyId.includes(":")
+                                            ? track.spotifyId.split(":").pop()
                                             : track.spotifyId;
 
                                         const spotifyUrl = `https://open.spotify.com/track/${cleanId}`;
