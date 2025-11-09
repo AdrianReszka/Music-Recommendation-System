@@ -35,7 +35,7 @@ public class SpotifyService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final SpotifyUserRepository spotifyUserRepository;
 
-    private static final String FIXED_PLAYLIST_NAME = "BeatBridge Recommendations Playlist";
+    private static final String FIXED_PLAYLIST_NAME = "Beat Bridge Recommendations Playlist";
 
     public String buildLoginUrl() {
         return "https://accounts.spotify.com/authorize" +

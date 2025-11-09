@@ -12,7 +12,7 @@ export default function PlaylistsPanel() {
     const [saved, setSaved] = useState(false);
     const [isLoadingTracks, setIsLoadingTracks] = useState(false);
 
-    const fixedPlaylistName = "BeatBridge Recommendations Playlist";
+    const fixedPlaylistName = "Beat Bridge Recommendations Playlist";
 
     useEffect(() => {
         const fetchAllRecommendationLists = async () => {
