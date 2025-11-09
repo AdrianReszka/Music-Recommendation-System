@@ -55,7 +55,15 @@ export default function LinkedAccountsPanel() {
             if (res.ok) {
                 setLinkedUsers(prev => prev.filter(u => u !== username));
                 if (selectedUser === username) setSelectedUser("");
-                setMessage(`Account "${username}" was unlinked successfully`);
+                setMessage(
+                    <>
+                        Account{" "}
+                        <span className="font-bold text-white">
+                            {username}
+                        </span>{" "}
+                                    was unlinked successfully
+                                </>
+                            );
             } else {
                 const err = await res.text();
                 alert(`Failed to unlink account: ${err}`);
