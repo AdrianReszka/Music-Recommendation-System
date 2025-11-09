@@ -21,10 +21,4 @@ export default function SpotifyCallbackPage() {
             navigate("/");
         }
     }, [navigate, searchParams]);
-
-    return (
-        <div className="text-white text-2xl text-center mt-20">
-            Logging in with Spotify...
-        </div>
-    );
 }
