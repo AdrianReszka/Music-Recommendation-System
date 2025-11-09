@@ -59,7 +59,7 @@ export default function LinkedAccountsPanel() {
                     <>
                         Account{" "}
                         <span className="font-bold text-white">
-                            {username}
+                            "{username}"
                         </span>{" "}
                                     was unlinked successfully
                                 </>
